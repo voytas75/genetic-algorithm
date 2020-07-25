@@ -20,7 +20,8 @@ function generateChromosomes {
         [int]$chromosomeCount = 4
     )
     <# 
-    function generates chromosome one or more. one is default. chromosome lenght is paramater. default is 6 genes per chromosome.
+    function generates chromosome one or more. 
+    default values are definied. 
     #>
     begin {
         $_chromosome = @()
