@@ -7,7 +7,7 @@ function generateGene {
     # function generate vale of gene
     # powershell statistics
     # check .net statistics 
-    [array]$geneValue = 1..$genecount | %{0..1 | get-random }
+    [array]$geneValue = 1..$genecount | ForEach-Object {0..1 | get-random }
     return $geneValue
 }
 
