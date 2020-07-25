@@ -1,5 +1,5 @@
 # script for learning genetics algorithms 
-function generateGene {
+function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
         [int]$geneCount = 6
@@ -7,17 +7,17 @@ function generateGene {
     # function generate vale of gene
     # powershell statistics
     # check .net statistics 
-    [array]$geneValue = 1..$genecount | ForEach-Object {0..1 | get-random }
+    [array]$geneValue = 1..$genecount | ForEach-Object {0..1 | get-random } 
     return $geneValue
 }
 
-function generateChromosomes {
+function generatePopulation {
     [CmdletBinding()]
     param (
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 8,
+        [int]$chromosomeCount = 4,
         [ValidateNotNullorEmpty()]
-        [int]$chromosomeCount = 4
+        [int]$geneCount = 8
     )
     <# 
     function generates chromosome one or more. 
@@ -35,7 +35,7 @@ function generateChromosomes {
         for ($i = 0; $i -lt $chromosomeCount; $i++) {
             #for ($j = 0; $j -lt $geneCount; $j++) {
                 #Write-Information -MessageData $i -InformationAction Continue
-                $_chromosome += ,[array](generateGene -geneCount $geneCount)
+                $_chromosome += ,[array](generateChromosome -geneCount $geneCount)
             # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
                 #}
         }
@@ -64,7 +64,7 @@ function PopulationStatictics {
 
 
 #generateGene
-[array]$population = generateChromosomes -geneCount 16 -chromosomeCount 10
+[array]$population = generatePopulation -chromosomeCount 10 -geneCount 16
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
