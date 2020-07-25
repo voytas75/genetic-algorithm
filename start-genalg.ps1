@@ -1,4 +1,5 @@
 # script for learning genetics algorithms 
+# locus [łac.], genet. pozycja w chromosomie zajmowana przez dany gen;
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
