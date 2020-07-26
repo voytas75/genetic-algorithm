@@ -58,14 +58,26 @@ function PopulationStatictics {
     return $population.count
 }
 
-function GenerateFitnessValue-Population {
+function GenerateFitnessValue_Population {
     param (
         [ValidateNotNullorEmpty()]
-        [array]$_population
+        [array]$population
     )
     # example fitness function
     # sum of genes >= mean sum all genes
-    $_
+    #Write-Information -MessageData "witam w funkcji 'GenerateFitnessValue_Population'" -InformationAction Continue
+    #Write-Information -MessageData ($population.count) -InformationAction Continue
+    #$_ValueFenotype = @()
+    $_GenerateSumGenes = $population.ForEach{($_ -match 1).count} # array of sum genes where are 1
+    #$population.ForEach{Write-Output $PSItem}
+    #$_GenerateSumGenes.foreach{+=$_    } 
+
+    $_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
+    $_GenerateSumGenes.foreach{$_Sumpopulation += $PSItem}
+    #$_meansumpopulation = 
+    $_Sumpopulation/($population.count)
+
+
 }
 
 
@@ -73,7 +85,7 @@ function GenerateFitnessValue-Population {
 
 
 #generateGene
-[array]$population = generatePopulation -chromosomeCount 10 -geneCount 16
+[array]$population = generatePopulation -chromosomeCount 10 -geneCount 8
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
@@ -82,4 +94,5 @@ function GenerateFitnessValue-Population {
 #}
 
 $populationStatistics = PopulationStatictics -population $population
-$populationStatistics | ForEach-Object {"population count: [$PSItem]"}
+$populationStatistics | ForEach-Object {"Population count: [$PSItem]"}
+GenerateFitnessValue_Population -population $population
