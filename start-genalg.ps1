@@ -58,7 +58,15 @@ function PopulationStatictics {
     return $population.count
 }
 
-
+function GenerateFitnessValue-Population {
+    param (
+        [ValidateNotNullorEmpty()]
+        [array]$_population
+    )
+    # example fitness function
+    # sum of genes >= mean sum all genes
+    $_
+}
 
 
 
@@ -72,5 +80,6 @@ function PopulationStatictics {
     #$individual
     $population | ForEach-Object {"Item: [$PSItem]"}
 #}
+
 $populationStatistics = PopulationStatictics -population $population
 $populationStatistics | ForEach-Object {"population count: [$PSItem]"}
