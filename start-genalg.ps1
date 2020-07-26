@@ -64,18 +64,30 @@ function GenerateFitnessValue_Population {
         [array]$population
     )
     # example fitness function
-    # sum of genes >= mean sum all genes
+    # sum of genes is odd
     #Write-Information -MessageData "witam w funkcji 'GenerateFitnessValue_Population'" -InformationAction Continue
     #Write-Information -MessageData ($population.count) -InformationAction Continue
     #$_ValueFenotype = @()
-    $_GenerateSumGenes = $population.ForEach{($_ -match 1).count} # array of sum genes where are 1
+    $_GenerateSumGenes = $population.ForEach{($_ -match 1).count} # array of sums 1 in genes
     #$population.ForEach{Write-Output $PSItem}
     #$_GenerateSumGenes.foreach{+=$_    } 
 
     $_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
-    $_GenerateSumGenes.foreach{$_Sumpopulation += $PSItem}
+    [array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}  
+    $_IsOdd.ForEach{"Odd Item (<sum genes with 1>): [$PSItem]"}# generate sum all gene sum
+
+    [array]$_indexPopulation_odd = $(0..($_IsOdd.Count-1)).where{$_indexpopulation = ($_IsOdd[$_] -eq $true);$_indexpopulation}
+    #$_IsOdd.IndexOf($true)
+    $_indexPopulation_odd
+    ($population[$_indexPopulation_odd]).ForEach{"Odd Item: [$PSItem]"}
+    ($_GenerateSumGenes[$_indexPopulation_odd]).ForEach{"Odd values Item: [$PSItem]"}
+    $_GenerateSumGenes[$_indexPopulation_odd] | sort -Descending # sorted desc of sums of 1es in gemes
+    $_SumOddItems = ($_IsOdd.where{$_ -match $true}).count #sum items with odd sum of genes
+    $_SumOddItems.foreach{Write-Output "Sum items in population with odd sum of genes: [$psitem]"}
+
+    #$_IsOddValue
     #$_meansumpopulation = 
-    $_Sumpopulation/($population.count)
+    #$_Sumpopulation/($population.count)
 
 
 }
@@ -85,7 +97,7 @@ function GenerateFitnessValue_Population {
 
 
 #generateGene
-[array]$population = generatePopulation -chromosomeCount 10 -geneCount 8
+[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
