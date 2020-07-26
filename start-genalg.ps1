@@ -81,7 +81,7 @@ function GenerateFitnessValue_Population {
     $_indexPopulation_odd
     ($population[$_indexPopulation_odd]).ForEach{"Odd Item: [$PSItem]"}
     ($_GenerateSumGenes[$_indexPopulation_odd]).ForEach{"Odd values Item: [$PSItem]"}
-    $_GenerateSumGenes[$_indexPopulation_odd] | sort -Descending # sorted desc of sums of 1es in gemes
+    $_GenerateSumGenes[$_indexPopulation_odd] | Sort-Object -Descending # sorted desc of sums of 1es in gemes
     $_SumOddItems = ($_IsOdd.where{$_ -match $true}).count #sum items with odd sum of genes
     $_SumOddItems.foreach{Write-Output "Sum items in population with odd sum of genes: [$psitem]"}
 
