@@ -121,7 +121,7 @@ function Roulette {
     #$AgregateSum.foreach{"Agregate: [$PSItem]"}
     [Object]$Random = New-Object System.Random
     $_popcount = $population.count
-    $_randomvalue = 1..$_popcount | % {$Random.NextDouble()}
+    $_randomvalue = 1..$_popcount | ForEach-Object {$Random.NextDouble()}
     #$_randomvalue.foreach{"Random value: [$psitem]"}
     $i=$j=0
     $_reproduceItems = @()
