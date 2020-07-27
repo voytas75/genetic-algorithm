@@ -73,7 +73,7 @@ function GenerateFitnessValue_Population {
     #$_GenerateSumGenes.foreach{+=$_    } 
     #$_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
 
-    [array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}
+    #[array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}
     #$_IsOdd.ForEach{"Odd Item (<sum genes with 1>): [$PSItem]"}# generate sum all gene sum
 
     [array]$_FitnessValue = $_GenerateSumGenes.foreach{if([bool]($psitem%2)){$PSItem}else{0}}
