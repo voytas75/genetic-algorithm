@@ -71,19 +71,25 @@ function GenerateFitnessValue_Population {
     $_GenerateSumGenes = $population.ForEach{($_ -match 1).count} # array of sums 1 in genes
     #$population.ForEach{Write-Output $PSItem}
     #$_GenerateSumGenes.foreach{+=$_    } 
+    #$_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
 
-    $_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
-    [array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}  
-    $_IsOdd.ForEach{"Odd Item (<sum genes with 1>): [$PSItem]"}# generate sum all gene sum
+    [array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}
+    #$_IsOdd.ForEach{"Odd Item (<sum genes with 1>): [$PSItem]"}# generate sum all gene sum
 
-    [array]$_indexPopulation_odd = $(0..($_IsOdd.Count-1)).where{$_indexpopulation = ($_IsOdd[$_] -eq $true);$_indexpopulation}
+    [array]$_FitnessValue = $_GenerateSumGenes.foreach{if([bool]($psitem%2)){$PSItem}else{0}}
+    #$_FitnessValue.foreach{"Fitness value: [$PSITEM]"}    
+    return $_FitnessValue
+
+    #[array]$_indexPopulation_odd = $(0..($_IsOdd.Count-1)).where{$_indexpopulation = ($_IsOdd[$_] -eq $true);$_indexpopulation}
+
     #$_IsOdd.IndexOf($true)
-    $_indexPopulation_odd
-    ($population[$_indexPopulation_odd]).ForEach{"Odd Item: [$PSItem]"}
-    ($_GenerateSumGenes[$_indexPopulation_odd]).ForEach{"Odd values Item: [$PSItem]"}
-    $_GenerateSumGenes[$_indexPopulation_odd] | Sort-Object -Descending # sorted desc of sums of 1es in gemes
-    $_SumOddItems = ($_IsOdd.where{$_ -match $true}).count #sum items with odd sum of genes
-    $_SumOddItems.foreach{Write-Output "Sum items in population with odd sum of genes: [$psitem]"}
+    #$_indexPopulation_odd
+    #($population[$_indexPopulation_odd]).ForEach{"Odd Item: [$PSItem]"}
+    #($_GenerateSumGenes[$_indexPopulation_odd]).ForEach{"Odd values Item: [$PSItem]"}
+
+    #$_GenerateSumGenes[$_indexPopulation_odd] | Sort-Object -Descending # sorted desc of sums of 1es in gemes
+    #$_SumOddItems = ($_IsOdd.where{$_ -match $true}).count #sum items with odd sum of genes
+    #$_SumOddItems.foreach{Write-Output "Sum items in population with odd sum of genes: [$psitem]"}
 
     #$_IsOddValue
     #$_meansumpopulation = 
@@ -92,19 +98,40 @@ function GenerateFitnessValue_Population {
 
 }
 
+function Roulette {
+    param (
+        $population,
+        $fitness
+    )
+    $_FitnessSum = 0
+    $_NormalizeItem = @()
+    $fitness.foreach{$_FitnessSum+=$PSItem}
+    $_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
+    $_NormalizeItem = $fitness.foreach{$Psitem/$_FitnessSum}
+    #$_NormalizeItem = $population / $_FitnessSum[0]
+    $_NormalizeItem.foreach{"Normalize: [$PSItem]"}
 
+    
+}
 
 
 
 #generateGene
+Write-Information -MessageData "Initialization" -InformationAction Continue
 [array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
     #$individual
-    $population | ForEach-Object {"Item: [$PSItem]"}
 #}
 
 $populationStatistics = PopulationStatictics -population $population
 $populationStatistics | ForEach-Object {"Population count: [$PSItem]"}
-GenerateFitnessValue_Population -population $population
+$population | ForEach-Object {"Item: [$PSItem]"}
+
+Write-Information -MessageData "Fitness" -InformationAction Continue
+$populationFitnessValue = GenerateFitnessValue_Population -population $population
+$populationFitnessValue.foreach{"Fitness value: [$PSItem]"}
+
+Write-Information -MessageData "Roulette" -InformationAction Continue
+Roulette -population $population -fitness $populationFitnessValue
