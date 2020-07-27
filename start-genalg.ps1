@@ -107,17 +107,63 @@ function Roulette {
     $_NormalizeItem = @()
     $_aggregatesum = 0
     $fitness.foreach{$_FitnessSum+=$PSItem}
-    $_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
+    #$_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
+    if (-not $_FitnessSum) {
+        "STOP"
+        exit
+    }
+
     $_NormalizeItem = $fitness.foreach{$Psitem/$_FitnessSum}
     #$_NormalizeItem = $population / $_FitnessSum[0]
-    $_NormalizeItem.foreach{"Normalize: [$PSItem]"}
+    #$_NormalizeItem.foreach{"Normalize: [$PSItem]"}
 
-    $_NormalizeItem.foreach{$_aggregatesum += $PSItem; $_aggregatesum}
+    [array]$AgregateSum = $_NormalizeItem.foreach{$_aggregatesum += $PSItem;$_aggregatesum}
+    #$AgregateSum.foreach{"Agregate: [$PSItem]"}
     [Object]$Random = New-Object System.Random
-    1..20 | % {$Random.NextDouble()}
-    $population.count
-
-
+    $_popcount = $population.count
+    $_randomvalue = 1..$_popcount | % {$Random.NextDouble()}
+    #$_randomvalue.foreach{"Random value: [$psitem]"}
+    $i=$j=0
+    $_reproduceItems = @()
+    do {
+        #$_randomvalue[$i]
+        #"`$i = $i"
+        $j=0
+        #$_NormalizeItem[0]
+        #$_NormalizeItem[0] -lt 1
+        if ($_Normalizeitem[0] -lt 1) {
+            do {
+            #"`$j = $j"
+            #"aa"
+            #$_randomvalue[0] -le $AgregateSum[0]
+            if ($_randomvalue[0] -le $AgregateSum[0]) {
+                break
+            }
+            #$_randomvalue[$i]
+            #$AgregateSum[$j] 
+            #"bb"
+            if ($_randomvalue[$i] -lt $AgregateSum[0]) {
+                break
+            }
+            $j++
+            #$_randomvalue[$i] -gt $AgregateSum[$j-1]
+            #$_randomvalue[$i] -le $AgregateSum[$j]
+            #$AgregateSum[$j-1] -eq 1
+            #"------"
+        } until (($_randomvalue[$i] -gt $AgregateSum[$j-1] -and $_randomvalue[$i] -le $AgregateSum[$j]) -or $AgregateSum[$j-1] -eq 1 -or $j -gt $_popcount)
+    }
+        #($j).foreach{"Wybrano $($psitem)"}
+        [array]$_reproduceItems += ,@($population[($j)])
+        #$fitness[$i]
+        #$population #| where {"asd: [$PSItem]"}
+        #[String]::Join(' ', $population[($j)]);
+        #-join $population[$i]
+        #$_NormalizeItem[$i] 
+        $i++
+        #"=========="
+    } until ($i -ge $_popcount)
+    #$_reproduceItems.foreach{"[$Psitem]"}
+    return $_reproduceItems
 }
 
 function Get-Entropy
@@ -191,7 +237,7 @@ New-Object PSObject -Property $Randomness
 
 #generateGene
 Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
+[array]$population = generatePopulation -chromosomeCount 5 -geneCount 10
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
@@ -207,4 +253,5 @@ $populationFitnessValue = GenerateFitnessValue_Population -population $populatio
 $populationFitnessValue.foreach{"Fitness value: [$PSItem]"}
 
 Write-Information -MessageData "Roulette" -InformationAction Continue
-Roulette -population $population -fitness $populationFitnessValue
+$_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+$_ReproductionItems.foreach{"Reproduction item: [$Psitem]"}
