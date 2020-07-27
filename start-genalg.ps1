@@ -105,15 +105,88 @@ function Roulette {
     )
     $_FitnessSum = 0
     $_NormalizeItem = @()
+    $_aggregatesum = 0
     $fitness.foreach{$_FitnessSum+=$PSItem}
     $_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
     $_NormalizeItem = $fitness.foreach{$Psitem/$_FitnessSum}
     #$_NormalizeItem = $population / $_FitnessSum[0]
     $_NormalizeItem.foreach{"Normalize: [$PSItem]"}
 
-    
+    $_NormalizeItem.foreach{$_aggregatesum += $PSItem; $_aggregatesum}
+    [Object]$Random = New-Object System.Random
+    1..20 | % {$Random.NextDouble()}
+    $population.count
+
+
 }
 
+function Get-Entropy
+{
+    Param (
+        [Parameter(Mandatory = $True)]
+        [ValidateNotNullOrEmpty()]
+        [Byte[]]
+        $Bytes
+   )
+ 
+   $FrequencyTable = @{}
+   foreach ($Byte in $Bytes) {
+       $FrequencyTable[$Byte]++
+   }
+   $Entropy = 0.0
+ 
+   foreach ($Byte in 0..255)
+   {
+       $ByteProbability = ([Double]$FrequencyTable[[Byte]$Byte])/$Bytes.Length
+       if ($ByteProbability -gt 0)
+       {
+           $Entropy += -$ByteProbability * [Math]::Log($ByteProbability, 2)
+       }
+   }
+   $Entropy
+}
+
+function Get-RandomByte
+{
+    Param (
+        [Parameter(Mandatory = $True)]
+        [UInt32]
+        $Length,
+ 
+        [Parameter(Mandatory = $True)]
+        [ValidateSet('GetRandom', 'CryptoRNG')]
+        [String]
+        $Method
+    )
+ 
+    $RandomBytes = New-Object Byte[]($Length)
+ 
+    switch ($Method)
+    {
+        'GetRandom' {
+            foreach ($i in 0..($Length - 1))
+            {
+                $RandomBytes[$i] = Get-Random -Minimum 0 -Maximum 256
+            }
+         }
+         'CryptoRNG' {
+             $RNG = [Security.Cryptography.RNGCryptoServiceProvider]::Create()
+             $RNG.GetBytes($RandomBytes)
+         }
+    }
+    $RandomBytes
+}
+
+#random
+#$Length = 0x1000
+#$CryptoRNGBytes = Get-RandomByte -Length $Length -Method CryptoRNG
+#$Randomness = @{
+#    CryptoRNGEntropy = Get-Entropy -Bytes $CryptoRNGBytes
+#}
+New-Object PSObject -Property $Randomness
+#$CryptoRngAverage = $Results | measure -Average -Property CryptoRNGEntropy
+
+#Get-Random -SetSeed ([int]($CryptoRngAverage * 10000000))
 
 
 #generateGene
