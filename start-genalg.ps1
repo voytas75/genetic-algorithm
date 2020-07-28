@@ -195,9 +195,61 @@ function Mutation {
         $population,
         $mutationProb
     )
-    foreach ($item in $population) {
-        $item
+    [Object]$Random = New-Object System.Random
+    $i=0
+    foreach ($items in $population) {
+     #"i="+$i   #$items
+        $j=0
+        foreach ($item in $items) {
+            #" j="+$j
+            #$item
+            $_crossoverprob_rand = $Random.NextDouble()
+            #$_crossoverprob_rand
+            #$_crossoverprob_rand -le $mutationProb
+            if($_crossoverprob_rand -le $mutationProb) {
+                #"  indexy: "+$i+$j    
+                #$items[$item]
+                #$population[$i][$j]    
+                if([int]$population[$i][$j] -eq 1) {
+                    #" zmiana z 1 na 0"
+                    #$_tmp_item=$items[$item]
+                    #" "+$_tmp_item
+                    #"  indexy: "+$i+$j    
+                    #"  item z items population PRZED: "+$items
+                    #"  item z array population PRZED: "+$population[$i]
+                    #$items[$item] = 0
+                    #$item=0
+                    #$population[$i][$j]
+                    $population[$i][$j]=0
+                    #$items[$item]
+                    #"na dole musi byc 0 a na gorze 1"
+                    #"  item z items population PO:    "+$items
+                    #"  item z array population PO:    "+$population[$i]
+                    #$population[0][1]
+                } else {
+                    #" zmiana z 0 na 1"
+                    #$_tmp_item=$items[$item]
+                    #" "+$_tmp_item
+                    #"tu ma byc 0: "+$items[$item]
+                    #"  indexy: "+$i+$j    
+                    #"  item z items population PRZED: "+$items
+                    #"  item z array population PRZED: "+$population[$i]
+                    #$items[$item]=1
+                    #$item=1
+                    #$population[$i][$j]
+                    $population[$i][$j]=1
+                    #"tu ma byc 1: "+$items[$item]
+                    #"  item z items population PO:    "+$items
+                    #"  item z array population PO:    "+$population[$i]
+                    #$population[0][1]
+                }
+            }    
+        $j++
+        }
+        $i++
     }
+    return $population
+    #$population.foreach{"Muted       Item: [$psitem]"}
 }
 function Get-Entropy {
     Param (
@@ -264,7 +316,7 @@ New-Object PSObject -Property $Randomness
 
 #generateGene
 Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 6 -geneCount 10
+[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
@@ -275,18 +327,29 @@ $populationStatistics = PopulationStatictics -population $population
 $populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
 $population | ForEach-Object { "Item: [$PSItem]" }
 
+    
+
 Write-Information -MessageData "Fitness" -InformationAction Continue
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
 $populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 
-Write-Information -MessageData "Selection" -InformationAction Continue
-Write-Information -MessageData "Roulette" -InformationAction Continue
+for ($i = 0; $i -lt 100; $i++) {
+
+
+Write-Information -MessageData "Selection $($i)" -InformationAction Continue
+Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
 $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-$_ReproductionItems.foreach{ "Reproduction item: [$Psitem]" }
+#$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
 
-Write-Information -MessageData "Crossover" -InformationAction Continue
-$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.5
-$CrossovertPopulation.foreach{"CrossedOver Item: [$psitem]"}
+Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
+$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.4
+#$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
 
-Write-Information -MessageData "Mutation" -InformationAction Continue
-Mutation -population $CrossovertPopulation -mutationProb 0,1
+Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
+$mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.05
+#$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
+
+Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
+$populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
+$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
+}
