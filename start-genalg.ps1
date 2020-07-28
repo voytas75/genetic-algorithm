@@ -136,15 +136,15 @@ function Roulette {
             #"`$j = $j"
             #"aa"
             #$_randomvalue[0] -le $AgregateSum[0]
-            if ($_randomvalue[0] -le $AgregateSum[0]) {
+            if ($_randomvalue[0] -le $AgregateSum[0] -or $_randomvalue[$i] -lt $AgregateSum[0]) {
                 break
             }
             #$_randomvalue[$i]
             #$AgregateSum[$j] 
             #"bb"
-            if ($_randomvalue[$i] -lt $AgregateSum[0]) {
-                break
-            }
+            #if ($_randomvalue[$i] -lt $AgregateSum[0]) {
+            #    break
+            #}
             $j++
             #$_randomvalue[$i] -gt $AgregateSum[$j-1]
             #$_randomvalue[$i] -le $AgregateSum[$j]
@@ -164,6 +164,14 @@ function Roulette {
     } until ($i -ge $_popcount)
     #$_reproduceItems.foreach{"[$Psitem]"}
     return $_reproduceItems
+}
+
+function Crossover {
+    param (
+        $population,
+        $crossoverProb
+    )
+    
 }
 
 function Get-Entropy
@@ -237,7 +245,7 @@ New-Object PSObject -Property $Randomness
 
 #generateGene
 Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
+[array]$population = generatePopulation -chromosomeCount 5 -geneCount 5
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
@@ -252,6 +260,10 @@ Write-Information -MessageData "Fitness" -InformationAction Continue
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
 $populationFitnessValue.foreach{"Fitness value: [$PSItem]"}
 
+Write-Information -MessageData "Selection" -InformationAction Continue
 Write-Information -MessageData "Roulette" -InformationAction Continue
 $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
 $_ReproductionItems.foreach{"Reproduction item: [$Psitem]"}
+
+Write-Information -MessageData "Crossover" -InformationAction Continue
+$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.5
