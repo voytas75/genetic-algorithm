@@ -237,7 +237,7 @@ New-Object PSObject -Property $Randomness
 
 #generateGene
 Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 5 -geneCount 10
+[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
     #Write-Output "Individual:"
