@@ -55,7 +55,7 @@ function PopulationStatictics {
         [array]$population
     )
     # param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
-    return $population.count
+    return $population.count,
 }
 
 function GenerateFitnessValue_Population {
