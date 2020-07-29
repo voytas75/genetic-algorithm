@@ -24,12 +24,7 @@ function generatePopulation {
     function generates chromosome one or more. 
     default values are definied. 
     #>
-    begin {
         $_population = @()
-        
-    }
-    
-    process {
         #New-Object [PSCustomObject]@{
         #    Gene = Value
         #}    
@@ -41,12 +36,7 @@ function generatePopulation {
             #}
         }
         #1..[int]$chromosomeCount | ForEach-Object {1..[int]$geneCount} | ForEach-Object {$_chromosomeIndex = $_ - 1;Write-Output $_chromosomeIndex; $_chromosome[$_chromosomeIndex] += generateGene}
-        
-    }
-    
-    end {
         return $_population
-    }
 }
 
 function PopulationStatictics {
@@ -259,17 +249,17 @@ function Mutation {
     return $population
     #$population.foreach{"Muted       Item: [$psitem]"}
 }
-$generations = 1
+$generations = 5
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 10 -geneCount 10
+[array]$population = generatePopulation -chromosomeCount 16 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
 #$individual
 #}
 
-$populationStatistics = PopulationStatictics -population $population
+#$populationStatistics = PopulationStatictics -population $population
 #$populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
 #$population | ForEach-Object { "Item: [$PSItem]" }
 
@@ -278,7 +268,7 @@ $populationFitnessValue = GenerateFitnessValue_Population -population $populatio
 #$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 $fitnessPopulation = PopulationStatictics -population $population -fitness
 #$fitnessPopulation
-[array]$allGenerations += ,($fitnessPopulation,$population)
+[array]$allGenerations += ,@(0,$fitnessPopulation,$population)
 
 for ($i = 0; $i -lt $generations; $i++) {
 $fitnessPopulation = 0
@@ -300,12 +290,18 @@ $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.05
 $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
 #$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
 
-$fitnessPopulation = PopulationStatictics -population $population -fitness 
-$fitnessPopulation
+$fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
+#$fitnessPopulation
 
-[array]$allGenerations += ,($fitnessPopulation,$population)
+[array]$allGenerations += ,@(($i+1),$fitnessPopulation,$mutedPopulation)
 
 $population = $mutedPopulation
 
 }
+$allGenerations[$generations][0]
+$allGenerations[$generations][1]
+($allGenerations[$generations][2]).foreach{"{$psitem}"}
+#($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
+#$allGenerations | Out-GridView
 $allGenerations
+
