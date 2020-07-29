@@ -323,7 +323,7 @@ New-Object PSObject -Property $Randomness
 
 
 #generateGene
-Write-Information -MessageData "Initialization" -InformationAction Continue
+#Write-Information -MessageData "Initialization" -InformationAction Continue
 [array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
@@ -332,18 +332,17 @@ Write-Information -MessageData "Initialization" -InformationAction Continue
 #}
 
 $populationStatistics = PopulationStatictics -population $population
-$populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
-$population | ForEach-Object { "Item: [$PSItem]" }
+#$populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
+#$population | ForEach-Object { "Item: [$PSItem]" }
 
-    
-
-Write-Information -MessageData "Fitness" -InformationAction Continue
+#Write-Information -MessageData "Fitness" -InformationAction Continue
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
-$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
+#$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
+$fitnessPopulation = PopulationStatictics -population $population -fitness
+$fitnessPopulation
 
-for ($i = 0; $i -lt 100; $i++) {
-
-
+for ($i = 0; $i -lt 10; $i++) {
+$fitnessPopulation = 0
 #Write-Information -MessageData "Selection $($i)" -InformationAction Continue
 #Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
 $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
@@ -363,5 +362,7 @@ $population = $mutedPopulation
 $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
 #$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
 
-PopulationStatictics -population $population -fitness 
+$fitnessPopulation = PopulationStatictics -population $population -fitness 
+$fitnessPopulation
+#[array]$
 }
