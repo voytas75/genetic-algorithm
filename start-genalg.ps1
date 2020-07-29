@@ -262,7 +262,7 @@ function Mutation {
 $generations = 1
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
+[array]$population = generatePopulation -chromosomeCount 10 -geneCount 10
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
@@ -277,7 +277,8 @@ $populationStatistics = PopulationStatictics -population $population
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
 #$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 $fitnessPopulation = PopulationStatictics -population $population -fitness
-$fitnessPopulation
+#$fitnessPopulation
+[array]$allGenerations += ,($fitnessPopulation,$population)
 
 for ($i = 0; $i -lt $generations; $i++) {
 $fitnessPopulation = 0
@@ -307,3 +308,4 @@ $fitnessPopulation
 $population = $mutedPopulation
 
 }
+$allGenerations
