@@ -249,10 +249,10 @@ function Mutation {
     return $population
     #$population.foreach{"Muted       Item: [$psitem]"}
 }
-$generations = 4000
+$generations = 100
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 40 -geneCount 50
+[array]$population = generatePopulation -chromosomeCount 4 -geneCount 99
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
@@ -303,5 +303,12 @@ $allGenerations[$generations][1]
 ($allGenerations[$generations][2]).foreach{"{$psitem}"}
 #($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
 #$allGenerations | Out-GridView
-$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx"
+#$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
+$newarray = $allGenerations.foreach{$psitem[1]}
+#$cd = New-ExcelChartDefinition -
+#$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
+#barchart ($newarray)
+#$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
+#$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
+#$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
