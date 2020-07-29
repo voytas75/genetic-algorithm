@@ -249,10 +249,10 @@ function Mutation {
     return $population
     #$population.foreach{"Muted       Item: [$psitem]"}
 }
-$generations = 5
+$generations = 4000
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 16 -geneCount 20
+[array]$population = generatePopulation -chromosomeCount 40 -geneCount 50
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
@@ -278,11 +278,11 @@ $_ReproductionItems = Roulette -population $population -fitness $populationFitne
 #$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
 
 #Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
-$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.4
+$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.2
 #$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
 
 #Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
-$mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.05
+$mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.01
 #$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
 
 
@@ -303,5 +303,5 @@ $allGenerations[$generations][1]
 ($allGenerations[$generations][2]).foreach{"{$psitem}"}
 #($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
 #$allGenerations | Out-GridView
-$allGenerations
+$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx"
 
