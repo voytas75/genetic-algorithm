@@ -25,7 +25,7 @@ function generatePopulation {
     default values are definied. 
     #>
     begin {
-        $_chromosome = @()
+        $_population = @()
         
     }
     
@@ -36,26 +36,34 @@ function generatePopulation {
         for ($i = 0; $i -lt $chromosomeCount; $i++) {
             #for ($j = 0; $j -lt $geneCount; $j++) {
             #Write-Information -MessageData $i -InformationAction Continue
-            $_chromosome += , [array](generateChromosome -geneCount $geneCount)
+            $_population += , [array](generateChromosome -geneCount $geneCount)
             # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
             #}
         }
         #1..[int]$chromosomeCount | ForEach-Object {1..[int]$geneCount} | ForEach-Object {$_chromosomeIndex = $_ - 1;Write-Output $_chromosomeIndex; $_chromosome[$_chromosomeIndex] += generateGene}
-        $_chromosome
+        
     }
     
     end {
-        
+        return $_population
     }
 }
 
 function PopulationStatictics {
     param (
         [ValidateNotNullorEmpty()]
-        [array]$population
+        [array]$population,
+        [switch]$fitness
     )
     # param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
-    return $population.count
+    $_FitnessSum = 0
+    if ($fitness) {
+        $_fitness = GenerateFitnessValue_Population -population $population
+        $_fitness.foreach{ $_FitnessSum += $PSItem }
+        return $_FitnessSum
+    } else {
+        return $population.count
+    }
 }
 
 function GenerateFitnessValue_Population {
@@ -336,20 +344,24 @@ $populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 for ($i = 0; $i -lt 100; $i++) {
 
 
-Write-Information -MessageData "Selection $($i)" -InformationAction Continue
-Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
+#Write-Information -MessageData "Selection $($i)" -InformationAction Continue
+#Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
 $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
 #$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
 
-Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
+#Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
 $CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.4
 #$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
 
-Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
+#Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
 $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.05
 #$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
 
-Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
+$population = $mutedPopulation
+
+#Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
 $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
-$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
+#$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
+
+PopulationStatictics -population $population -fitness 
 }
