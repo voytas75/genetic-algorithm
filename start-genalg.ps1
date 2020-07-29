@@ -36,12 +36,12 @@ function generatePopulation {
         for ($i = 0; $i -lt $chromosomeCount; $i++) {
             #for ($j = 0; $j -lt $geneCount; $j++) {
             #Write-Information -MessageData $i -InformationAction Continue
-            populationsome += , [array](generateChromosome -geneCount $geneCount)
+            $_population += , [array](generateChromosome -geneCount $geneCount)
             # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
             #}
         }
         #1..[int]$chromosomeCount | ForEach-Object {1..[int]$geneCount} | ForEach-Object {$_chromosomeIndex = $_ - 1;Write-Output $_chromosomeIndex; $_chromosome[$_chromosomeIndex] += generateGene}
-        $romosome
+        
     }
     
     end {
@@ -61,8 +61,7 @@ function PopulationStatictics {
         $_fitness = GenerateFitnessValue_Population -population $population
         $_fitness.foreach{ $_FitnessSum += $PSItem }
         return $_FitnessSum
-    }
-    else {
+    } else {
         return $population.count
     }
 }
@@ -145,15 +144,15 @@ function Roulette {
                 #"`$j = $j"
                 #"aa"
                 #$_randomvalue[0] -le $AgregateSum[0]
-                if ($_randomvalue[0] -le $AgregateSum[0]) {
+                if ($_randomvalue[0] -le $AgregateSum[0] -or $_randomvalue[$i] -lt $AgregateSum[0]) {
                     break
                 }
                 #$_randomvalue[$i]
                 #$AgregateSum[$j] 
                 #"bb"
-                if ($_randomvalue[$i] -lt $AgregateSum[0]) {
-                    break
-                }
+                #if ($_randomvalue[$i] -lt $AgregateSum[0]) {
+                #    break
+                #}
                 $j++
                 #$_randomvalue[$i] -gt $AgregateSum[$j-1]
                 #$_randomvalue[$i] -le $AgregateSum[$j]
@@ -175,88 +174,99 @@ function Roulette {
     return $_reproduceItems
 }
 
-function Get-Entropy {
-    Param (
-        [Parameter(Mandatory = $True)]
-        [ValidateNotNullOrEmpty()]
-        [Byte[]]
-        $Bytes
+function Crossover {
+    param (
+        $population,
+        $crossoverProb
     )
- 
-    $FrequencyTable = @{}
-    foreach ($Byte in $Bytes) {
-        $FrequencyTable[$Byte]++
-    }
-    $Entropy = 0.0
- 
-    foreach ($Byte in 0..255) {
-        $ByteProbability = ([Double]$FrequencyTable[[Byte]$Byte]) / $Bytes.Length
-        if ($ByteProbability -gt 0) {
-            $Entropy += - $ByteProbability * [Math]::Log($ByteProbability, 2)
+    [Object]$Random = New-Object System.Random
+    for ($i = 0; $i -lt $population.Count; $i += 2) {
+        $_crossoverprob_rand = $Random.NextDouble()
+        if ($_crossoverprob_rand -le $crossoverProb) { 
+            #$_crossoverprob_rand    
+            $_crossoverPoint = 1..($population[0].count - 2) | get-random
+            #$_crossoverPoint
+            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
+            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
+        }
+        else {
+            #0
+            [array]$_crossoverpopulation += , ($population[$i])
+            [array]$_crossoverpopulation += , ($population[$i + 1])
         }
     }
-    $Entropy
+    #$_crossoverpopulation.foreach{"CrossedOver Item: [$psitem]"}
+    return $_crossoverpopulation
 }
-
-function Get-RandomByte {
-    Param (
-        [Parameter(Mandatory = $True)]
-        [UInt32]
-        $Length,
- 
-        [Parameter(Mandatory = $True)]
-        [ValidateSet('GetRandom', 'CryptoRNG')]
-        [String]
-        $Method
+function Mutation {
+    param (
+        $population,
+        $mutationProb
     )
- 
-    $RandomBytes = New-Object Byte[]($Length)
- 
-    switch ($Method) {
-        'GetRandom' {
-            foreach ($i in 0..($Length - 1)) {
-                $RandomBytes[$i] = Get-Random -Minimum 0 -Maximum 256
-            }
+    [Object]$Random = New-Object System.Random
+    $i=0
+    foreach ($items in $population) {
+     #"i="+$i   #$items
+        $j=0
+        foreach ($item in $items) {
+            #" j="+$j
+            #$item
+            $_crossoverprob_rand = $Random.NextDouble()
+            #$_crossoverprob_rand
+            #$_crossoverprob_rand -le $mutationProb
+            if($_crossoverprob_rand -le $mutationProb) {
+                #"  indexy: "+$i+$j    
+                #$items[$item]
+                #$population[$i][$j]    
+                if([int]$population[$i][$j] -eq 1) {
+                    #" zmiana z 1 na 0"
+                    #$_tmp_item=$items[$item]
+                    #" "+$_tmp_item
+                    #"  indexy: "+$i+$j    
+                    #"  item z items population PRZED: "+$items
+                    #"  item z array population PRZED: "+$population[$i]
+                    #$items[$item] = 0
+                    #$item=0
+                    #$population[$i][$j]
+                    $population[$i][$j]=0
+                    #$items[$item]
+                    #"na dole musi byc 0 a na gorze 1"
+                    #"  item z items population PO:    "+$items
+                    #"  item z array population PO:    "+$population[$i]
+                    #$population[0][1]
+                } else {
+                    #" zmiana z 0 na 1"
+                    #$_tmp_item=$items[$item]
+                    #" "+$_tmp_item
+                    #"tu ma byc 0: "+$items[$item]
+                    #"  indexy: "+$i+$j    
+                    #"  item z items population PRZED: "+$items
+                    #"  item z array population PRZED: "+$population[$i]
+                    #$items[$item]=1
+                    #$item=1
+                    #$population[$i][$j]
+                    $population[$i][$j]=1
+                    #"tu ma byc 1: "+$items[$item]
+                    #"  item z items population PO:    "+$items
+                    #"  item z array population PO:    "+$population[$i]
+                    #$population[0][1]
+                }
+            }    
+        $j++
         }
-        'CryptoRNG' {
-            $RNG = [Security.Cryptography.RNGCryptoServiceProvider]::Create()
-            $RNG.GetBytes($RandomBytes)
-        }
+        $i++
     }
-    $RandomBytes
+    return $population
+    #$population.foreach{"Muted       Item: [$psitem]"}
 }
-
-#random
-#$Length = 0x1000
-#$CryptoRNGBytes = Get-RandomByte -Length $Length -Method CryptoRNG
-#$Randomness = @{
-#    CryptoRNGEntropy = Get-Entropy -Bytes $CryptoRNGBytes
-#}
-New-Object PSObject -Property $Randomness
-#$CryptoRngAverage = $Results | measure -Average -Property CryptoRNGEntropy
-
-#Get-Random -SetSeed ([int]($CryptoRngAverage * 10000000))
-
-
+$generations = 1
 #generateGene
-Write-Information -MessageData "Initialization" -InformationAction Continue
+#Write-Information -MessageData "Initialization" -InformationAction Continue
 [array]$population = generatePopulation -chromosomeCount 20 -geneCount 20
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
 #$individual
-#}
-
-$populationStatistics = PopulationStatictics -population $population
-$populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
-$population | ForEach-Object { "Item: [$PSItem]" }
-
-Write-Information -MessageData "Fitness" -InformationAction Continue
-$populationFitnessValue = GenerateFitnessValue_Population -population $population
-$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
-$generations = 1
-$_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-$_ReproductionItems.foreach{ "Reproduction item: [$Psitem]" }
 #}
 
 $populationStatistics = PopulationStatictics -population $population
@@ -268,7 +278,7 @@ $populationFitnessValue = GenerateFitnessValue_Population -population $populatio
 #$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 $fitnessPopulation = PopulationStatictics -population $population -fitness
 $fitnessPopulation
-[array]$allGenerations += ,@($fitnessPopulation,[array]$population)
+
 for ($i = 0; $i -lt $generations; $i++) {
 $fitnessPopulation = 0
 #Write-Information -MessageData "Selection $($i)" -InformationAction Continue
@@ -292,9 +302,8 @@ $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopu
 $fitnessPopulation = PopulationStatictics -population $population -fitness 
 $fitnessPopulation
 
-[array]$allGenerations += ,@($fitnessPopulation,[array]$population)
+[array]$allGenerations += ,($fitnessPopulation,$population)
 
 $population = $mutedPopulation
 
 }
-$allGenerations.foreach{$PSitem}
