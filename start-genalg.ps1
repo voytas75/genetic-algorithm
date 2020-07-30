@@ -29,7 +29,7 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    (1..$chromosomeCount).foreach{ $_population += ,[array](generateChromosome -geneCount $geneCount) }
+    (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
     return $_population
 }
 
@@ -47,9 +47,10 @@ function PopulationStatictics {
         (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
         return $_FitnessSum
     }
-    elseif($count) {
+    elseif ($count) {
         return $population.count
-    } else {
+    }
+    else {
         return $null
     }
 }
@@ -116,12 +117,12 @@ function Crossover {
         $_crossoverprob_rand = $Random.NextDouble()
         if ($_crossoverprob_rand -le $crossoverProb) { 
             $_crossoverPoint = 1..($population[0].count - 2) | get-random
-            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
-            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
+            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
+            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
         }
         else {
-            [array]$_crossoverpopulation += ,($population[$i])
-            [array]$_crossoverpopulation += ,($population[$i + 1])
+            [array]$_crossoverpopulation += , ($population[$i])
+            [array]$_crossoverpopulation += , ($population[$i + 1])
         }
     }
     return $_crossoverpopulation
