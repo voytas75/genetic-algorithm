@@ -165,7 +165,13 @@ $PopulationSize = 80
 $ChromosomeSize = 30
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
-if ($Log) { Write-Log "$(Get-Date): Number of generations: $($genetations)" }
+if ($Log) { 
+    Write-Log "$(Get-Date): Number of generations: [$($generations)]" 
+    Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
+    Write-Log "$(Get-Date): Chromosome Size (genes): [$($ChromosomeSize)]" 
+    Write-Log "$(Get-Date): Crossover probability: [$($CrossOverProbability)]" 
+    Write-Log "$(Get-Date): Mutation probability: [$($MutationProbability)]" 
+}
 
 
 
@@ -193,9 +199,10 @@ for ($i = 0; $i -lt $generations; $i++) {
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
+####barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
+
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
 #$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
