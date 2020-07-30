@@ -23,20 +23,12 @@ function generatePopulation {
     <# 
     function generates chromosome one or more. 
     default values are definied. 
+
+    # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
-        $_population = @()
-        #New-Object [PSCustomObject]@{
-        #    Gene = Value
-        #}    
-        for ($i = 0; $i -lt $chromosomeCount; $i++) {
-            #for ($j = 0; $j -lt $geneCount; $j++) {
-            #Write-Information -MessageData $i -InformationAction Continue
-            $_population += , [array](generateChromosome -geneCount $geneCount)
-            # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
-            #}
-        }
-        #1..[int]$chromosomeCount | ForEach-Object {1..[int]$geneCount} | ForEach-Object {$_chromosomeIndex = $_ - 1;Write-Output $_chromosomeIndex; $_chromosome[$_chromosomeIndex] += generateGene}
-        return $_population
+    $_population = @()
+    (0..$chromosomeCount).foreach{$_population += , [array](generateChromosome -geneCount $geneCount)}
+    return $_population
 }
 
 function PopulationStatictics {
@@ -51,7 +43,8 @@ function PopulationStatictics {
         $_fitness = GenerateFitnessValue_Population -population $population
         $_fitness.foreach{ $_FitnessSum += $PSItem }
         return $_FitnessSum
-    } else {
+    }
+    else {
         return $population.count
     }
 }
@@ -194,21 +187,21 @@ function Mutation {
         $mutationProb
     )
     [Object]$Random = New-Object System.Random
-    $i=0
+    $i = 0
     foreach ($items in $population) {
-     #"i="+$i   #$items
-        $j=0
+        #"i="+$i   #$items
+        $j = 0
         foreach ($item in $items) {
             #" j="+$j
             #$item
             $_crossoverprob_rand = $Random.NextDouble()
             #$_crossoverprob_rand
             #$_crossoverprob_rand -le $mutationProb
-            if($_crossoverprob_rand -le $mutationProb) {
+            if ($_crossoverprob_rand -le $mutationProb) {
                 #"  indexy: "+$i+$j    
                 #$items[$item]
                 #$population[$i][$j]    
-                if([int]$population[$i][$j] -eq 1) {
+                if ([int]$population[$i][$j] -eq 1) {
                     #" zmiana z 1 na 0"
                     #$_tmp_item=$items[$item]
                     #" "+$_tmp_item
@@ -218,13 +211,14 @@ function Mutation {
                     #$items[$item] = 0
                     #$item=0
                     #$population[$i][$j]
-                    $population[$i][$j]=0
+                    $population[$i][$j] = 0
                     #$items[$item]
                     #"na dole musi byc 0 a na gorze 1"
                     #"  item z items population PO:    "+$items
                     #"  item z array population PO:    "+$population[$i]
                     #$population[0][1]
-                } else {
+                }
+                else {
                     #" zmiana z 0 na 1"
                     #$_tmp_item=$items[$item]
                     #" "+$_tmp_item
@@ -235,14 +229,14 @@ function Mutation {
                     #$items[$item]=1
                     #$item=1
                     #$population[$i][$j]
-                    $population[$i][$j]=1
+                    $population[$i][$j] = 1
                     #"tu ma byc 1: "+$items[$item]
                     #"  item z items population PO:    "+$items
                     #"  item z array population PO:    "+$population[$i]
                     #$population[0][1]
                 }
             }    
-        $j++
+            $j++
         }
         $i++
     }
@@ -268,44 +262,44 @@ $populationFitnessValue = GenerateFitnessValue_Population -population $populatio
 #$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 $fitnessPopulation = PopulationStatictics -population $population -fitness
 #$fitnessPopulation
-[array]$allGenerations += ,@(0,$fitnessPopulation,$population)
+[array]$allGenerations += , @(0, $fitnessPopulation, $population)
 
 for ($i = 0; $i -lt $generations; $i++) {
-$fitnessPopulation = 0
-#Write-Information -MessageData "Selection $($i)" -InformationAction Continue
-#Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
-$_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-#$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
+    $fitnessPopulation = 0
+    #Write-Information -MessageData "Selection $($i)" -InformationAction Continue
+    #Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
+    $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+    #$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
 
-#Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
-$CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.2
-#$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
+    #Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
+    $CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.2
+    #$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
 
-#Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
-$mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.01
-#$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
+    #Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
+    $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.01
+    #$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
 
 
-#Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
-$populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
-#$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
+    #Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
+    $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
+    #$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
 
-$fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-#$fitnessPopulation
+    $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
+    #$fitnessPopulation
 
-[array]$allGenerations += ,@(($i+1),$fitnessPopulation,$mutedPopulation)
+    [array]$allGenerations += , @(($i + 1), $fitnessPopulation, $mutedPopulation)
 
-$population = $mutedPopulation
+    $population = $mutedPopulation
 
 }
 $allGenerations[$generations][0]
 $allGenerations[$generations][1]
-($allGenerations[$generations][2]).foreach{"{$psitem}"}
+($allGenerations[$generations][2]).foreach{ "{$psitem}" }
 #($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
 #$allGenerations | Out-GridView
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
-$newarray = $allGenerations.foreach{$psitem[1]}
+$newarray = $allGenerations.foreach{ $psitem[1] }
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
 #barchart ($newarray)
