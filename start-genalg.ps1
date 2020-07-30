@@ -114,19 +114,18 @@ function Crossover {
         $crossoverProb
     )
     [Object]$Random = New-Object System.Random
-    for ($i = 0; $i -lt $population.Count; $i += 2) {
-        $_crossoverprob_rand = $Random.NextDouble()
-        if ($_crossoverprob_rand -le $crossoverProb) { 
+    for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
+        if (($Random.NextDouble()) -le $crossoverProb) { 
             $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
-            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
-            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
+            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
+            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
         }
         else {
             [array]$_crossoverpopulation += ,($population[$i])
             [array]$_crossoverpopulation += ,($population[$i + 1])
         }
     }
-    return $_crossoverpopulation
+    return $_CrossoverPopulation
 }
 function Mutation {
     param (
@@ -136,51 +135,15 @@ function Mutation {
     [Object]$Random = New-Object System.Random
     $i = 0
     foreach ($items in $population) {
-        #"i="+$i   #$items
         $j = 0
         foreach ($item in $items) {
-            #" j="+$j
-            #$item
             $_crossoverprob_rand = $Random.NextDouble()
-            #$_crossoverprob_rand
-            #$_crossoverprob_rand -le $mutationProb
             if ($_crossoverprob_rand -le $mutationProb) {
-                #"  indexy: "+$i+$j    
-                #$items[$item]
-                #$population[$i][$j]    
                 if ($population[$i][$j] -eq 1) {
-                    #" zmiana z 1 na 0"
-                    #$_tmp_item=$items[$item]
-                    #" "+$_tmp_item
-                    #"  indexy: "+$i+$j    
-                    #"  item z items population PRZED: "+$items
-                    #"  item z array population PRZED: "+$population[$i]
-                    #$items[$item] = 0
-                    #$item=0
-                    #$population[$i][$j]
                     $population[$i][$j] = 0
-                    #$items[$item]
-                    #"na dole musi byc 0 a na gorze 1"
-                    #"  item z items population PO:    "+$items
-                    #"  item z array population PO:    "+$population[$i]
-                    #$population[0][1]
                 }
                 else {
-                    #" zmiana z 0 na 1"
-                    #$_tmp_item=$items[$item]
-                    #" "+$_tmp_item
-                    #"tu ma byc 0: "+$items[$item]
-                    #"  indexy: "+$i+$j    
-                    #"  item z items population PRZED: "+$items
-                    #"  item z array population PRZED: "+$population[$i]
-                    #$items[$item]=1
-                    #$item=1
-                    #$population[$i][$j]
                     $population[$i][$j] = 1
-                    #"tu ma byc 1: "+$items[$item]
-                    #"  item z items population PO:    "+$items
-                    #"  item z array population PO:    "+$population[$i]
-                    #$population[0][1]
                 }
             }    
             $j++
@@ -188,7 +151,6 @@ function Mutation {
         $i++
     }
     return $population
-    #$population.foreach{"Muted       Item: [$psitem]"}
 }
 $generations = 10
 $PopulationSize = 6
