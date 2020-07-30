@@ -43,8 +43,10 @@ function PopulationStatictics {
         [switch]$count,
         [switch]$fitness
     )
-    # param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
-    #$_FitnessSum = 0
+    <# 
+    param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
+    #>
+    $_FitnessSum = 0
     if ($fitness) {
         #$_fitness = GenerateFitnessValue_Population -population $population
         (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
