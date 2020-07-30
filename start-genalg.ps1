@@ -158,9 +158,9 @@ function Mutation {
 }
 
 Import-Module importexcel
-$generations = 300
+$generations = 3
 $PopulationSize = 80
-$ChromosomeSize = 20
+$ChromosomeSize = 30
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 
@@ -187,10 +187,10 @@ for ($i = 0; $i -lt $generations; $i++) {
 #$allGenerations | Out-GridView
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
-$newarray = $allGenerations.foreach{ $psitem[1] }
+$AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-barchart ($newarray) -ChartType line -nolegend -title "Generation's fitness value"
+barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
 #$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
