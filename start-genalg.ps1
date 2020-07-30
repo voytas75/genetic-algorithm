@@ -5,12 +5,13 @@ function generateChromosome {
         [ValidateNotNullorEmpty()]
         [int]$geneCount = 6
     )
-    # function generate vale of gene
-    # powershell statistics
-    # check .net statistics 
+    <#
+    function generate vale of gene
+    powershell statistics
+    check .net statistics 
+    #>
     $_chromosome = @()
     return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
-    #return $geneValue
 }
 
 function generatePopulation {
@@ -28,7 +29,7 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    (1..$chromosomeCount).foreach{$_population += , [array](generateChromosome -geneCount $geneCount)}
+    (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
     return $_population
 }
 
@@ -100,10 +101,10 @@ function Roulette {
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
     if (-not $_FitnessSum) {
+        $_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
+        $population.foreach{ "Population item: [$PSItem]" }
         "[STOP]"
-    $_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
-    $_population.foreach{"population item: [$PSItem]"}
-    exit
+        exit
     }
 
     $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
