@@ -154,6 +154,8 @@ function Mutation {
     }
     return $population
 }
+
+Import-Module importexcel
 $generations = 300
 $PopulationSize = 80
 $ChromosomeSize = 20
