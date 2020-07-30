@@ -158,6 +158,7 @@ function Mutation {
 }
 Import-Module importexcel
 . .\Write-Log.ps1
+$log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
 $generations = 3
 $PopulationSize = 80
