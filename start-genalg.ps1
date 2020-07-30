@@ -18,9 +18,9 @@ function generatePopulation {
     [CmdletBinding()]
     param (
         [ValidateNotNullorEmpty()]
-        [int]$chromosomeCount = 4,
+        [int]$chromosomeCount = 10,
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 8
+        [int]$geneCount = 10
     )
     <# 
     function generates chromosome one or more. 
@@ -29,7 +29,7 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
+    (1..$chromosomeCount).foreach{ $_population += ,[array](generateChromosome -geneCount $geneCount) }
     return $_population
 }
 
@@ -37,17 +37,20 @@ function PopulationStatictics {
     param (
         [ValidateNotNullorEmpty()]
         [array]$population,
+        [switch]$count,
         [switch]$fitness
     )
     # param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
-    $_FitnessSum = 0
+    #$_FitnessSum = 0
     if ($fitness) {
-        $_fitness = GenerateFitnessValue_Population -population $population
-        $_fitness.foreach{ $_FitnessSum += $PSItem }
-        return $_FitnessSum
+        #$_fitness = GenerateFitnessValue_Population -population $population
+        return (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
+        #return $_FitnessSum
     }
-    else {
+    elseif($count) {
         return $population.count
+    } else {
+        return $null
     }
 }
 
