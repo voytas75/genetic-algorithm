@@ -1,5 +1,8 @@
-# script for learning genetics algorithms 
+<#
+script for learning genetics algorithms 
 # locus [łac.], genet. pozycja w chromosomie zajmowana przez dany gen;
+GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
+#> 
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
