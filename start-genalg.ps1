@@ -40,8 +40,10 @@ function PopulationStatictics {
     param (
         [ValidateNotNullorEmpty()]
         [array]$population,
-        [switch]$count,
-        [switch]$fitness
+        [switch]$Count,
+        [switch]$fitness,
+        [switch]$Maximum,
+        [switch]$Average        
     )
     <# 
     param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
@@ -52,7 +54,13 @@ function PopulationStatictics {
         (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
         return $_FitnessSum
     }
-    elseif ($count) {
+    elseif ($Count) {
+        return $population.count
+    }
+    elseif ($Maximum) {
+        return $population.count
+    }
+    elseif ($Average) {
         return $population.count
     }
     else {
@@ -160,37 +168,52 @@ Import-Module importexcel
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 3
-$PopulationSize = 80
-$ChromosomeSize = 30
+$generations = 4
+$PopulationSize = 8
+$ChromosomeSize = 99
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 if ($Log) { 
-    Write-Log "$(Get-Date): Number of generations: [$($generations)]" 
+    Write-Log "$(Get-Date): Number of iterations/generations: [$($generations)]" 
     Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
     Write-Log "$(Get-Date): Chromosome Size (genes): [$($ChromosomeSize)]" 
     Write-Log "$(Get-Date): Crossover probability: [$($CrossOverProbability)]" 
     Write-Log "$(Get-Date): Mutation probability: [$($MutationProbability)]" 
 }
 
-
-
 [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+if ($Log) { Write-Log "$(Get-Date): Population was generated." }
+if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
+$fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
+$fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
 $fitnessPopulation = PopulationStatictics -population $population -fitness
+if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
+if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
+if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
 [array]$allGenerations += , @(0, $fitnessPopulation, $population)
-
-for ($i = 0; $i -lt $generations; $i++) {
+for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
+    if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [$($i)]" }
+    if ($Log) { Write-Log "$(Get-Date): Selection." }
     $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+    if ($Log) { Write-Log "$(Get-Date): Crossover." }
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
+    if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
     $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
+    $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
+    $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-    [array]$allGenerations += , @(($i + 1), $fitnessPopulation, $mutedPopulation)
+    if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
+    if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
+    if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
+    [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
 }
+$IndexBestGeneration = ($allGenerations  | sort-object @{Expression={$_[1]}; Ascending=$false} | Select-Object @{expression={$_[0]};Label="Generation"}, @{expression={$_[1]};Label="Fitness"} -First 1).Generation
+if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 #$allGenerations[$generations][0]
 #$allGenerations[$generations][1]
 #($allGenerations[$generations][2]).foreach{ "{$psitem}" }
