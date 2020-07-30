@@ -27,7 +27,7 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    (0..$chromosomeCount).foreach{$_population += , [array](generateChromosome -geneCount $geneCount)}
+    (1..$chromosomeCount).foreach{$_population += , [array](generateChromosome -geneCount $geneCount)}
     return $_population
 }
 
@@ -243,10 +243,10 @@ function Mutation {
     return $population
     #$population.foreach{"Muted       Item: [$psitem]"}
 }
-$generations = 100
+$generations = 10
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 4 -geneCount 99
+[array]$population = generatePopulation -chromosomeCount 6 -geneCount 5
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
