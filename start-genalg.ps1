@@ -137,8 +137,7 @@ function Mutation {
     foreach ($items in $population) {
         $j = 0
         foreach ($item in $items) {
-            $_crossoverprob_rand = $Random.NextDouble()
-            if ($_crossoverprob_rand -le $mutationProb) {
+            if (($Random.NextDouble()) -le $mutationProb) {
                 if ($population[$i][$j] -eq 1) {
                     $population[$i][$j] = 0
                 }
@@ -152,58 +151,27 @@ function Mutation {
     }
     return $population
 }
-$generations = 10
-$PopulationSize = 6
-$ChromosomeSize = 5
-$CrossOverProbability = 0.4
-$MutationProbability = 0.01
-#generateGene
-#Write-Information -MessageData "Initialization" -InformationAction Continue
+$generations = 200
+$PopulationSize = 80
+$ChromosomeSize = 20
+$CrossOverProbability = 0.6
+$MutationProbability = 0.009
+
 [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-#$chromosome.GetType()
-#foreach ($individual in $population) {
-#Write-Output "Individual:"
-#$individual
-#}
 
-#$populationStatistics = PopulationStatictics -population $population
-#$populationStatistics | ForEach-Object { "Population count: [$PSItem]" }
-#$population | ForEach-Object { "Item: [$PSItem]" }
-
-#Write-Information -MessageData "Fitness" -InformationAction Continue
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
-#$populationFitnessValue.foreach{ "Fitness value: [$PSItem]" }
 $fitnessPopulation = PopulationStatictics -population $population -fitness
-#$fitnessPopulation
 [array]$allGenerations += , @(0, $fitnessPopulation, $population)
 
 for ($i = 0; $i -lt $generations; $i++) {
     $fitnessPopulation = 0
-    #Write-Information -MessageData "Selection $($i)" -InformationAction Continue
-    #Write-Information -MessageData "Roulette $($i)" -InformationAction Continue
     $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-    #$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
-
-    #Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
-    #$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
-
-    #Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
-    #$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
-
-
-    #Write-Information -MessageData "Fitness $($i)" -InformationAction Continue
     $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
-    #$populationFitnessValue.foreach{ "Fitness value $($i): [$PSItem]" }
-
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-    #$fitnessPopulation
-
     [array]$allGenerations += , @(($i + 1), $fitnessPopulation, $mutedPopulation)
-
     $population = $mutedPopulation
-
 }
 $allGenerations[$generations][0]
 $allGenerations[$generations][1]
@@ -215,7 +183,7 @@ $allGenerations[$generations][1]
 $newarray = $allGenerations.foreach{ $psitem[1] }
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-#barchart ($newarray)
+barchart ($newarray) -ChartType line -nolegend -title "Generation's fitness value"
 #$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
 #$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
