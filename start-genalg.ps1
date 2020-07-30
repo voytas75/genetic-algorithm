@@ -104,7 +104,7 @@ function Roulette {
                 $j++
             } until (($_randomvalue[$i] -gt $AgregateSum[$j - 1] -and $_randomvalue[$i] -le $AgregateSum[$j]) -or $AgregateSum[$j - 1] -eq 1 -or $j -gt $_popcount)
         }
-        [array]$_reproduceItems += ,@($population[($j)])
+        [array]$_reproduceItems += , @($population[($j)])
         $i++
     } until ($i -ge $_popcount)
     return $_reproduceItems
@@ -120,12 +120,12 @@ function Crossover {
     for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
         if (($Random.NextDouble()) -le $crossoverProb) { 
             $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
-            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
-            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
+            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
+            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
         }
         else {
-            [array]$_crossoverpopulation += ,($population[$i])
-            [array]$_crossoverpopulation += ,($population[$i + 1])
+            [array]$_crossoverpopulation += , ($population[$i])
+            [array]$_crossoverpopulation += , ($population[$i + 1])
         }
     }
     return $_CrossoverPopulation
