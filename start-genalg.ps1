@@ -156,13 +156,17 @@ function Mutation {
     }
     return $population
 }
-
 Import-Module importexcel
+. .\Write-Log.ps1
+if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
 $generations = 3
 $PopulationSize = 80
 $ChromosomeSize = 30
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
+if ($Log) { Write-Log "$(Get-Date): Number of generations: $($genetations)" }
+
+
 
 [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
 
