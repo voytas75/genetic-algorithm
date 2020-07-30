@@ -8,8 +8,9 @@ function generateChromosome {
     # function generate vale of gene
     # powershell statistics
     # check .net statistics 
-    [array]$geneValue = 1..$genecount | ForEach-Object { 0..1 | get-random } 
-    return $geneValue
+    $_chromosome = @()
+    return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
+    #return $geneValue
 }
 
 function generatePopulation {
@@ -98,10 +99,11 @@ function Roulette {
     $_NormalizeItem = @()
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
-    #$_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
     if (-not $_FitnessSum) {
-        "STOP"
-        exit
+        "[STOP]"
+    $_FitnessSum.foreach{"Fitness sum: [$PSItem]"}
+    $_population.foreach{"population item: [$PSItem]"}
+    exit
     }
 
     $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
