@@ -44,8 +44,8 @@ function PopulationStatictics {
     #$_FitnessSum = 0
     if ($fitness) {
         #$_fitness = GenerateFitnessValue_Population -population $population
-        return (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
-        #return $_FitnessSum
+        (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
+        return $_FitnessSum
     }
     elseif($count) {
         return $population.count
@@ -59,39 +59,13 @@ function GenerateFitnessValue_Population {
         [ValidateNotNullorEmpty()]
         [array]$population
     )
-    # example fitness function
-    # sum of genes is odd
-    #Write-Information -MessageData "witam w funkcji 'GenerateFitnessValue_Population'" -InformationAction Continue
-    #Write-Information -MessageData ($population.count) -InformationAction Continue
-    #$_ValueFenotype = @()
+    <#
+    example fitness function
+    sum of genes is odd
+    #>
+    $_FitnessPopulationItems = @()
     $_GenerateSumGenes = $population.ForEach{ ($_ -match 1).count } # array of sums 1 in genes
-    #$population.ForEach{Write-Output $PSItem}
-    #$_GenerateSumGenes.foreach{+=$_    } 
-    #$_GenerateSumGenes | ForEach-Object {"Sum Genes Item: [$PSItem]"}
-
-    #[array]$_IsOdd = $_GenerateSumGenes.foreach{[bool]($psitem%2)}
-    #$_IsOdd.ForEach{"Odd Item (<sum genes with 1>): [$PSItem]"}# generate sum all gene sum
-
-    [array]$_FitnessValue = $_GenerateSumGenes.foreach{ if ([bool]($psitem % 2)) { $PSItem }else { 0 } }
-    #$_FitnessValue.foreach{"Fitness value: [$PSITEM]"}    
-    return $_FitnessValue
-
-    #[array]$_indexPopulation_odd = $(0..($_IsOdd.Count-1)).where{$_indexpopulation = ($_IsOdd[$_] -eq $true);$_indexpopulation}
-
-    #$_IsOdd.IndexOf($true)
-    #$_indexPopulation_odd
-    #($population[$_indexPopulation_odd]).ForEach{"Odd Item: [$PSItem]"}
-    #($_GenerateSumGenes[$_indexPopulation_odd]).ForEach{"Odd values Item: [$PSItem]"}
-
-    #$_GenerateSumGenes[$_indexPopulation_odd] | Sort-Object -Descending # sorted desc of sums of 1es in gemes
-    #$_SumOddItems = ($_IsOdd.where{$_ -match $true}).count #sum items with odd sum of genes
-    #$_SumOddItems.foreach{Write-Output "Sum items in population with odd sum of genes: [$psitem]"}
-
-    #$_IsOddValue
-    #$_meansumpopulation = 
-    #$_Sumpopulation/($population.count)
-
-
+    return [array]$_FitnessPopulationItems = $_GenerateSumGenes.foreach{ if ([bool]($psitem % 2)) { $PSItem }else { 0 } }
 }
 
 function Roulette {
@@ -109,57 +83,26 @@ function Roulette {
         "[STOP]"
         exit
     }
-
     $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
-    #$_NormalizeItem = $population / $_FitnessSum[0]
-    #$_NormalizeItem.foreach{"Normalize: [$PSItem]"}
-
     [array]$AgregateSum = $_NormalizeItem.foreach{ $_aggregatesum += $PSItem; $_aggregatesum }
-    #$AgregateSum.foreach{"Agregate: [$PSItem]"}
     [Object]$Random = New-Object System.Random
-    $_popcount = $population.count
-    $_randomvalue = 1..$_popcount | ForEach-Object { $Random.NextDouble() }
-    #$_randomvalue.foreach{"Random value: [$psitem]"}
+    [int]$_popcount = PopulationStatictics -population $population -count
+    [array]$_randomvalue = (1..$_popcount).foreach{ $Random.NextDouble() }
     $i = $j = 0
     $_reproduceItems = @()
     do {
-        #$_randomvalue[$i]
-        #"`$i = $i"
         $j = 0
-        #$_NormalizeItem[0]
-        #$_NormalizeItem[0] -lt 1
         if ($_Normalizeitem[0] -lt 1) {
             do {
-                #"`$j = $j"
-                #"aa"
-                #$_randomvalue[0] -le $AgregateSum[0]
                 if ($_randomvalue[0] -le $AgregateSum[0] -or $_randomvalue[$i] -lt $AgregateSum[0]) {
                     break
                 }
-                #$_randomvalue[$i]
-                #$AgregateSum[$j] 
-                #"bb"
-                #if ($_randomvalue[$i] -lt $AgregateSum[0]) {
-                #    break
-                #}
                 $j++
-                #$_randomvalue[$i] -gt $AgregateSum[$j-1]
-                #$_randomvalue[$i] -le $AgregateSum[$j]
-                #$AgregateSum[$j-1] -eq 1
-                #"------"
             } until (($_randomvalue[$i] -gt $AgregateSum[$j - 1] -and $_randomvalue[$i] -le $AgregateSum[$j]) -or $AgregateSum[$j - 1] -eq 1 -or $j -gt $_popcount)
         }
-        #($j).foreach{"Wybrano $($psitem)"}
         [array]$_reproduceItems += , @($population[($j)])
-        #$fitness[$i]
-        #$population #| where {"asd: [$PSItem]"}
-        #[String]::Join(' ', $population[($j)]);
-        #-join $population[$i]
-        #$_NormalizeItem[$i] 
         $i++
-        #"=========="
     } until ($i -ge $_popcount)
-    #$_reproduceItems.foreach{"[$Psitem]"}
     return $_reproduceItems
 }
 
@@ -172,19 +115,15 @@ function Crossover {
     for ($i = 0; $i -lt $population.Count; $i += 2) {
         $_crossoverprob_rand = $Random.NextDouble()
         if ($_crossoverprob_rand -le $crossoverProb) { 
-            #$_crossoverprob_rand    
             $_crossoverPoint = 1..($population[0].count - 2) | get-random
-            #$_crossoverPoint
-            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
-            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
+            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
+            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
         }
         else {
-            #0
-            [array]$_crossoverpopulation += , ($population[$i])
-            [array]$_crossoverpopulation += , ($population[$i + 1])
+            [array]$_crossoverpopulation += ,($population[$i])
+            [array]$_crossoverpopulation += ,($population[$i + 1])
         }
     }
-    #$_crossoverpopulation.foreach{"CrossedOver Item: [$psitem]"}
     return $_crossoverpopulation
 }
 function Mutation {
@@ -207,7 +146,7 @@ function Mutation {
                 #"  indexy: "+$i+$j    
                 #$items[$item]
                 #$population[$i][$j]    
-                if ([int]$population[$i][$j] -eq 1) {
+                if ($population[$i][$j] -eq 1) {
                     #" zmiana z 1 na 0"
                     #$_tmp_item=$items[$item]
                     #" "+$_tmp_item
