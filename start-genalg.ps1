@@ -79,9 +79,9 @@ function Roulette {
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
     if (-not $_FitnessSum) {
-        $_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
-        $population.foreach{ "Population item: [$PSItem]" }
-        "[STOP]"
+        #$_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
+        #$population.foreach{ "Population item: [$PSItem]" }
+        #"[STOP]"
         exit
     }
     $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
@@ -151,7 +151,7 @@ function Mutation {
     }
     return $population
 }
-$generations = 200
+$generations = 300
 $PopulationSize = 80
 $ChromosomeSize = 20
 $CrossOverProbability = 0.6
@@ -173,9 +173,9 @@ for ($i = 0; $i -lt $generations; $i++) {
     [array]$allGenerations += , @(($i + 1), $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
 }
-$allGenerations[$generations][0]
-$allGenerations[$generations][1]
-($allGenerations[$generations][2]).foreach{ "{$psitem}" }
+#$allGenerations[$generations][0]
+#$allGenerations[$generations][1]
+#($allGenerations[$generations][2]).foreach{ "{$psitem}" }
 #($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
 #$allGenerations | Out-GridView
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
