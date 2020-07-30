@@ -101,7 +101,7 @@ function Roulette {
                 $j++
             } until (($_randomvalue[$i] -gt $AgregateSum[$j - 1] -and $_randomvalue[$i] -le $AgregateSum[$j]) -or $AgregateSum[$j - 1] -eq 1 -or $j -gt $_popcount)
         }
-        [array]$_reproduceItems += , @($population[($j)])
+        [array]$_reproduceItems += ,@($population[($j)])
         $i++
     } until ($i -ge $_popcount)
     return $_reproduceItems
@@ -110,19 +110,20 @@ function Roulette {
 function Crossover {
     param (
         $population,
+        $ChromosomeSize,
         $crossoverProb
     )
     [Object]$Random = New-Object System.Random
     for ($i = 0; $i -lt $population.Count; $i += 2) {
         $_crossoverprob_rand = $Random.NextDouble()
         if ($_crossoverprob_rand -le $crossoverProb) { 
-            $_crossoverPoint = 1..($population[0].count - 2) | get-random
-            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
-            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
+            $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
+            [array]$_crossoverpopulation += ,($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($population[0].Count)]) 
+            [array]$_crossoverpopulation += ,($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($population[0].Count)])
         }
         else {
-            [array]$_crossoverpopulation += , ($population[$i])
-            [array]$_crossoverpopulation += , ($population[$i + 1])
+            [array]$_crossoverpopulation += ,($population[$i])
+            [array]$_crossoverpopulation += ,($population[$i + 1])
         }
     }
     return $_crossoverpopulation
@@ -190,9 +191,13 @@ function Mutation {
     #$population.foreach{"Muted       Item: [$psitem]"}
 }
 $generations = 10
+$PopulationSize = 6
+$ChromosomeSize = 5
+$CrossOverProbability = 0.4
+$MutationProbability = 0.01
 #generateGene
 #Write-Information -MessageData "Initialization" -InformationAction Continue
-[array]$population = generatePopulation -chromosomeCount 6 -geneCount 5
+[array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
 #$chromosome.GetType()
 #foreach ($individual in $population) {
 #Write-Output "Individual:"
@@ -218,11 +223,11 @@ for ($i = 0; $i -lt $generations; $i++) {
     #$_ReproductionItems.foreach{ "Reproduction item $($i): [$Psitem]" }
 
     #Write-Information -MessageData "Crossover $($i)" -InformationAction Continue
-    $CrossovertPopulation = Crossover -population $_ReproductionItems -crossoverProb 0.2
+    $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     #$CrossovertPopulation.foreach{"CrossedOver Item $($i): [$psitem]"}
 
     #Write-Information -MessageData "Mutation $($i)" -InformationAction Continue
-    $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb 0.01
+    $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
     #$mutedPopulation.foreach{"Muted Item $($i): [$psitem]"}
 
 
