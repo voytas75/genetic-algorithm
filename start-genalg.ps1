@@ -225,8 +225,12 @@ $allGenerations[$IndexBestGeneration][2].foreach{"[$psitem]"}
 #$allGenerations | Out-GridView
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
+
+<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
-####barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
+barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
+#>
+
 
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
