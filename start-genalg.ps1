@@ -164,7 +164,8 @@ function Mutation {
     }
     return $population
 }
-Import-Module importexcel
+import-module importexcel
+if (!(get-module importexcel)) {write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'."}
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
