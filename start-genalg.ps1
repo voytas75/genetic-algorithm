@@ -217,6 +217,7 @@ if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression={$_[1]}; Ascending=$false} | Select-Object @{expression={$_[0]};Label="Generation"}, @{expression={$_[1]};Label="Fitness"} -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
+write-output "Best generation: [$($IndexBestGeneration)]"
 $allGenerations[$IndexBestGeneration][2].foreach{"[$psitem]"}
 #$allGenerations[$generations][0]
 #$allGenerations[$generations][1]
