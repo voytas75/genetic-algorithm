@@ -125,18 +125,58 @@ function Tournament {
         $population,
         $fitness
     )
-    $_Kindividuals=4
-    $_tournamentIndex = @()
+    $_Kindividuals = 4
+    #$_tournamentIndex = @()
     $_PopulationSize = PopulationStatictics -population $fitness -Count
     #wybieramy indexy osobnikow do zawodow
-    (1..$_Kindividuals).foreach{[array]$_tournamentIndex += (0..($_PopulationSize-1) | Get-Random -count 1)}
+    #(1..$_Kindividuals).foreach{ [array]$_tournamentIndex += (0..($_PopulationSize - 1) | Get-Random -count 1) }
     #return $_tournamentIndex
-    Write-Output "-"
-    $_tournamentIndex
-    Write-Output "+"
+    #Write-Output "-"
+    #$_tournamentIndex
+    #Write-Output "+"
     #$population | 
-    Get-Random -InputObject $population
+    #Get-Random -InputObject $population
+    $_PopulationWinners = @()
+    for ($ii = 0; $ii -lt $_PopulationSize; $ii++) {
+        #convert $population to hash table
+        #Write-Output "array"
+        #$population.foreach{ "$_" }
+        $_population_hashtable_temp = @{}
+        $_populationHashTable = @{}
+        $i = 0
+        #convert array to hash table:
+        $_populationHashTable = ($population).foreach{ $_population_hashtable_temp + @{item = $i; genome = $_; fitness = $fitness[$i] }; $i++ }
+        #get items to tournament
+        $_TournamentPlayers = get-random -InputObject $_populationHashTable -count $_Kindividuals 
+        #Write-Output "hash table"
+        #$population_hashtable | Export-Clixml -Path population_hashtable.xml
+    
+        #$_popuationHashTable
+        #Write-Output "hash table"
+        #$_TournamentPlayers
+        #    Write-Output "hash table"
+        #    $_TournamentPlayers[0]
+        #Write-Output "hash table sorted by fitness"
 
+        #$_TournamentPlayers | Export-Clixml -path _TournamentPlayers.xml
+
+        #sort items by fitness
+        $_TournamentPlayers_SortFitness = $_TournamentPlayers.GetEnumerator() | Sort-Object -property { $_.fitness } -descending
+        #$_TournamentPlayers_SortFitness.getenumerator() 
+        #Write-Output "hash table sorted by fitness First"
+        $_TurnamentWinner = @{}
+        # sorting items by fitness and take first one
+        $_TurnamentWinner = $_TournamentPlayers_SortFitness | Select-Object -first 1
+        #Write-Output "Winner hashtable"
+        #$_TurnamentWinner
+        #Write-Output "Winner array"
+        #"$($population[$_TurnamentWinner.item])"
+        #building Tournament winner as population to mutate
+        $_PopulationWinners += , ($population[$_TurnamentWinner.item])
+    }
+    #Write-Output "Winner's array"
+    #$_PopulationWinners.foreach{"[$_]"}
+    return $_PopulationWinners
     <#
     posortowanie tabeli hash po value i pobranie z pierwszego rekordu wartsci value:
     ($b.GetEnumerator() | Sort-Object -Descending -Property value |Select-Object -First 1).value
@@ -196,13 +236,13 @@ function Mutation {
     return $population
 }
 import-module importexcel
-if (!(get-module importexcel)) {write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'."}
+if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
 $generations = 1
-$PopulationSize = 10
-$ChromosomeSize = 7
+$PopulationSize = 20
+$ChromosomeSize = 20
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 if ($Log) { 
@@ -229,11 +269,11 @@ for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
     if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [$($i)]" }
     if ($Log) { Write-Log "$(Get-Date): Selection." }
-    $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+    #$_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+    $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
     
     
-    Tournament -population $population -fitness $populationFitnessValue
     
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
@@ -250,11 +290,11 @@ for ($i = 1; $i -le $generations; $i++) {
 }
 if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 
-$IndexBestGeneration = ($allGenerations  | sort-object @{Expression={$_[1]}; Ascending=$false} | Select-Object @{expression={$_[0]};Label="Generation"}, @{expression={$_[1]};Label="Fitness"} -First 1).Generation
+$IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
 write-output "Best generation: [$($IndexBestGeneration)]"
-$allGenerations[$IndexBestGeneration][2].foreach{"[$psitem]"}
+$allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
 #$allGenerations[$generations][0]
 #$allGenerations[$generations][1]
 #($allGenerations[$generations][2]).foreach{ "{$psitem}" }
