@@ -126,10 +126,30 @@ function Tournament {
         $fitness
     )
     $_Kindividuals=4
+    $_tournamentIndex = @()
     $_PopulationSize = PopulationStatictics -population $fitness -Count
     #wybieramy indexy osobnikow do zawodow
-    (1..$_Kindividuals).foreach{[array]$_tournamentIndex += (0..($_PopulationSize-1) | Get-Random)}
-    return $_tournamentIndex
+    (1..$_Kindividuals).foreach{[array]$_tournamentIndex += (0..($_PopulationSize-1) | Get-Random -count 1)}
+    #return $_tournamentIndex
+    Write-Output "-"
+    $_tournamentIndex
+    Write-Output "+"
+    #$population | 
+    Get-Random -InputObject $population
+
+    <#
+    posortowanie tabeli hash po value i pobranie z pierwszego rekordu wartsci value:
+    ($b.GetEnumerator() | Sort-Object -Descending -Property value |Select-Object -First 1).value
+
+    convert array to hash table:
+    $d=@{}
+    $i=0
+    ($population).foreach{$d[$i]=$_;$i++}
+    #>
+
+
+    #$population | Export-Clixml -Path poulation.xml
+    #$fitness | Export-Clixml -Path fitness.xml
 }
 function Crossover {
     param (
@@ -180,9 +200,9 @@ if (!(get-module importexcel)) {write-warning "Module 'ImportExcel wasn't found.
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 10
-$PopulationSize = 20
-$ChromosomeSize = 15
+$generations = 1
+$PopulationSize = 10
+$ChromosomeSize = 7
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 if ($Log) { 
@@ -211,9 +231,10 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Selection." }
     $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
-    $_x=Tournament -population $population -fitness $populationFitnessValue
     
-    ($_x).foreach{"[$psitem]"}
+    
+    Tournament -population $population -fitness $populationFitnessValue
+    
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
