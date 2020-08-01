@@ -128,7 +128,7 @@ function Tournament {
     $_Kindividuals=4
     $_PopulationSize = PopulationStatictics -population $fitness -Count
     #wybieramy indexy osobnikow do zawodow
-    (1..$_Kindividuals).foreach{$_tournamentIndex += ,    (0..($_PopulationSize-1) | Get-Random)}
+    (1..$_Kindividuals).foreach{$_tournamentIndex += , (0..($_PopulationSize-1) | Get-Random)}
     return $_tournamentIndex
 }
 function Crossover {
