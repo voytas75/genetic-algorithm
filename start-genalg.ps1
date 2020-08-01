@@ -240,9 +240,9 @@ if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 1
-$PopulationSize = 20
-$ChromosomeSize = 20
+$generations = 100
+$PopulationSize = 80
+$ChromosomeSize = 40
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 if ($Log) { 
@@ -293,8 +293,8 @@ if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
-write-output "Best generation: [$($IndexBestGeneration)]"
-$allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
+#write-output "Best generation: [$($IndexBestGeneration)]"
+#$allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
 #$allGenerations[$generations][0]
 #$allGenerations[$generations][1]
 #($allGenerations[$generations][2]).foreach{ "{$psitem}" }
@@ -303,7 +303,7 @@ $allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
 
-<#
+#<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
 barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
