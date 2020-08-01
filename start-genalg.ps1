@@ -120,6 +120,17 @@ function Roulette {
     return $_reproduceItems
 }
 
+function Tournament {
+    param (
+        $population,
+        $fitness
+    )
+    $_Kindividuals=4
+    $_PopulationSize = PopulationStatictics -population $fitness -Count
+    #wybieramy indexy osobnikow do zawodow
+    (1..$_Kindividuals).foreach{$_tournamentIndex += ,    (0..($_PopulationSize-1) | Get-Random)}
+    return $_tournamentIndex
+}
 function Crossover {
     param (
         $population,
@@ -200,6 +211,9 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Selection." }
     $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
+    $_x=Tournament -population $population -fitness $populationFitnessValue
+    
+    ($_x).foreach{"[$psitem]"}
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
