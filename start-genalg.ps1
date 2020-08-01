@@ -2,6 +2,7 @@
 script for learning genetics algorithms 
 # locus [łac.], genet. pozycja w chromosomie zajmowana przez dany gen;
 GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
+PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 #> 
 function generateChromosome {
     param (
@@ -240,7 +241,7 @@ if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 100
+$generations = 1000
 $PopulationSize = 80
 $ChromosomeSize = 40
 $CrossOverProbability = 0.6
@@ -269,31 +270,53 @@ for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
     if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [$($i)]" }
     if ($Log) { Write-Log "$(Get-Date): Selection." }
-    #$_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-    $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
+    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
+    $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+    "selection - Roulette: $($MeasureFunction.ElapsedMilliseconds)"   
+    #$_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
+    #"selection - Tournament: $($MeasureFunction.ElapsedMilliseconds)"   
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
     
     
-    
+    #$MeasureFunction = [system.diagnostics.stopwatch]::startnew()
+    $MeasureFunction2 = [system.diagnostics.stopwatch]::startnew()
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
+    "Crossover: $($MeasureFunction2.ElapsedMilliseconds)"   
+    "Crossover + selection: $($MeasureFunction.ElapsedMilliseconds)"   
+  
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
+    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
+    "Mutation: $($MeasureFunction.ElapsedMilliseconds)"   
+    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
+    "GenerateFitnessValue_Population: $($MeasureFunction.ElapsedMilliseconds)"   
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
+    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
+    "PopulationStatictics: $($MeasureFunction.ElapsedMilliseconds)"   
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
     [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
 }
+
 if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
-#write-output "Best generation: [$($IndexBestGeneration)]"
+write-output "Best generation: [$($IndexBestGeneration)]"
+
+<#
+ Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
+ PS2EXE:
+ Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
+ #>
+
+
 #$allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
 #$allGenerations[$generations][0]
 #$allGenerations[$generations][1]
