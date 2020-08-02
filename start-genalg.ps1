@@ -263,6 +263,7 @@ else {
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
+#4
 new-variable -scope script -name m -Value 0
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
