@@ -236,14 +236,20 @@ function Mutation {
     }
     return $population
 }
-import-module importexcel
-if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
+#7
+if (Get-Module -ListAvailable -Name importexcel) {
+    import-module importexcel
+} 
+else {
+    write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'."
+}
+#7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 1000
-$PopulationSize = 80
-$ChromosomeSize = 40
+$generations = 1
+$PopulationSize = 8
+$ChromosomeSize = 4
 $CrossOverProbability = 0.6
 $MutationProbability = 0.009
 if ($Log) { 
