@@ -302,30 +302,23 @@ for ($i = 1; $i -le $generations; $i++) {
     $_SelectionGlobalExecutionTime = $_SelectionGlobalExecutionTime + $script:_functionExecutionTime
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
-    "Crossover: $($MeasureFunction2.ElapsedMilliseconds)"   
-    "Crossover + selection: $($MeasureFunction.ElapsedMilliseconds)"   
-  
+    
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
-    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
-  
+    #4
     $_mutations = $_mutations + $script:m
-    "Mutation: $($MeasureFunction.ElapsedMilliseconds)"   
-    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
-    "GenerateFitnessValue_Population: $($MeasureFunction.ElapsedMilliseconds)"   
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
-    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-    "PopulationStatictics: $($MeasureFunction.ElapsedMilliseconds)"   
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
     [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
-    if ($Log) { Write-Log "$(Get-Date): End no. Generation/Iteration: [$($i)]" }
+    if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
 }
+if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
 #4
 if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
 #5
