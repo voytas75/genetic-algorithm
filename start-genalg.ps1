@@ -88,6 +88,9 @@ function Roulette {
         $population,
         $fitness
     )
+    #5
+    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
+    $script:_functionExecutionTime = 0
     $_FitnessSum = 0
     $_NormalizeItem = @()
     $_aggregatesum = 0
@@ -118,6 +121,8 @@ function Roulette {
         [array]$_reproduceItems += , @($population[($j)])
         $i++
     } until ($i -ge $_popcount)
+    $script:_functionExecutionTime = $MeasureFunction.ElapsedMilliseconds
+    if ($Log) { Write-Log "$(Get-Date): Selection 'Roulette' execution time: ($script:_functionExecutionTime ms)" }
     return $_reproduceItems
 }
 
@@ -259,9 +264,13 @@ else {
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
 new-variable -scope script -name m -Value 0
+#5
+New-Variable -Scope script -Name _functionExecutionTime -Value 0
+ 
 $_mutations = 0
-$generations = 10
-$PopulationSize = 80
+$_SelectionGlobalExecutionTime = 0
+$generations = 5
+$PopulationSize = 160
 $ChromosomeSize = 40
 $CrossOverProbability = 0.6
 $MutationProbability = 0.0009
@@ -287,18 +296,11 @@ if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for th
 [array]$allGenerations += , @(0, $fitnessPopulation, $population)
 for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
-    if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [$($i)]" }
+    if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
     if ($Log) { Write-Log "$(Get-Date): Selection." }
-    $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
-    "selection - Roulette: $($MeasureFunction.ElapsedMilliseconds)"   
-    #$_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
-    #"selection - Tournament: $($MeasureFunction.ElapsedMilliseconds)"   
+    $_SelectionGlobalExecutionTime = $_SelectionGlobalExecutionTime + $script:_functionExecutionTime
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
-    
-    
-    #$MeasureFunction = [system.diagnostics.stopwatch]::startnew()
-    $MeasureFunction2 = [system.diagnostics.stopwatch]::startnew()
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     "Crossover: $($MeasureFunction2.ElapsedMilliseconds)"   
     "Crossover + selection: $($MeasureFunction.ElapsedMilliseconds)"   
@@ -306,6 +308,7 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
+  
     $_mutations = $_mutations + $script:m
     "Mutation: $($MeasureFunction.ElapsedMilliseconds)"   
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -321,12 +324,14 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
     [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
+    if ($Log) { Write-Log "$(Get-Date): End no. Generation/Iteration: [$($i)]" }
 }
 #4
 if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
+#5
+if ($Log) { Write-Log "$(Get-Date): Global selection execution time: [$_SelectionGlobalExecutionTime ms]" }
 
 
-if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
