@@ -4,6 +4,10 @@ script for learning genetics algorithms
 GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 #> 
+param (
+    [bool]$log = $true
+)
+
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
@@ -266,6 +270,8 @@ function Mutation {
     return $population
 }
 # MAIN CODE
+$MeasureScript = [system.diagnostics.stopwatch]::startnew()
+
 #7
 if (Get-Module -ListAvailable -Name importexcel) {
     import-module importexcel
@@ -275,13 +281,14 @@ else {
 }
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 . .\Write-Log.ps1
-$log = $true
+
 if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
 #4
 new-variable -scope script -name m -Value 0
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
-$selection = "tournament" 
+$_selectionDictionary = @("Roulette", "Tournament")
+$selection = $_selectionDictionary[0]
 $_mutations = 0
 $_SelectionGlobalExecutionTime = 0
 $_CrossoverGlobalExecutionTime = 0
@@ -389,4 +396,5 @@ barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's 
 #$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
 #$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
+if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
 if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
