@@ -5,7 +5,12 @@ GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 #> 
 param (
-    [bool]$log = $true
+    [bool]$log = $true,
+    $generations = 5,
+    $PopulationSize = 160,
+    $ChromosomeSize = 40,
+    $CrossOverProbability = 0.6,
+    $MutationProbability = 0.0009
 )
 
 function generateChromosome {
@@ -293,11 +298,6 @@ $_mutations = 0
 $_SelectionGlobalExecutionTime = 0
 $_CrossoverGlobalExecutionTime = 0
 $_MutationGlobalExecutionTime = 0
-$generations = 5
-$PopulationSize = 160
-$ChromosomeSize = 40
-$CrossOverProbability = 0.6
-$MutationProbability = 0.0009
 if ($Log) { 
     Write-Log "$(Get-Date): Number of iterations/generations: [$($generations)]" 
     Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
