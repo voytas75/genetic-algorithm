@@ -219,23 +219,34 @@ function Mutation {
     )
     [Object]$Random = New-Object System.Random
     $i = 0
+    $script:m = 0
     foreach ($items in $population) {
         $j = 0
         foreach ($item in $items) {
             if (($Random.NextDouble()) -le $mutationProb) {
+                #we are in! mutation time! Lets change some genes!
+                #4
+                $script:m++
+                #Write-Information -MessageData "mutacja: ($m)" -InformationAction Continue
                 if ($population[$i][$j] -eq 1) {
                     $population[$i][$j] = 0
+                    if ($Log) { Write-Log "$(Get-Date): Mutation! Item [$i], Gene [$j] 1 -> 0" }
                 }
                 else {
                     $population[$i][$j] = 1
+                    if ($Log) { Write-Log "$(Get-Date): Mutation! Item [$i], Gene [$j] 0 -> 1" }
                 }
+
             }    
             $j++
         }
         $i++
     }
+    #Write-Information -MessageData "Liczba wszstkich mutacji w populacji: [$m]" -InformationAction Continue
+    if ($Log) { Write-Log "$(Get-Date): Number of all mutations in population: [$script:m]" }
     return $population
 }
+# MAIN CODE
 #7
 if (Get-Module -ListAvailable -Name importexcel) {
     import-module importexcel
@@ -247,11 +258,13 @@ else {
 . .\Write-Log.ps1
 $log = $true
 if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
-$generations = 1
-$PopulationSize = 8
-$ChromosomeSize = 4
+new-variable -scope script -name m -Value 0
+$_mutations = 0
+$generations = 10
+$PopulationSize = 80
+$ChromosomeSize = 40
 $CrossOverProbability = 0.6
-$MutationProbability = 0.009
+$MutationProbability = 0.0009
 if ($Log) { 
     Write-Log "$(Get-Date): Number of iterations/generations: [$($generations)]" 
     Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
@@ -293,6 +306,7 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
+    $_mutations = $_mutations + $script:m
     "Mutation: $($MeasureFunction.ElapsedMilliseconds)"   
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
@@ -308,6 +322,9 @@ for ($i = 1; $i -le $generations; $i++) {
     [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
 }
+#4
+if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
+
 
 if ($Log) { Write-Log "$(Get-Date): End Generation/Iteration." }
 
@@ -332,7 +349,7 @@ write-output "Best generation: [$($IndexBestGeneration)]"
 #$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
 
 
-#<#
+<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
 barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
