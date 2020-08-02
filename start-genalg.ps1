@@ -262,7 +262,7 @@ else {
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 . .\Write-Log.ps1
 $log = $true
-if ($Log) { Write-Log "$(Get-Date): Initialize GA." }
+if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
 new-variable -scope script -name m -Value 0
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
@@ -358,3 +358,4 @@ barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's 
 #$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
 #$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
+if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
