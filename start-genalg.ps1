@@ -49,7 +49,7 @@ function generatePopulation {
 function PopulationStatictics {
     param (
         [ValidateNotNullorEmpty()]
-        [array]$population,
+        [array[]]$population,
         [switch]$Count,
         [switch]$fitness,
         [switch]$Maximum,
@@ -81,7 +81,7 @@ function PopulationStatictics {
 function GenerateFitnessValue_Population {
     param (
         [ValidateNotNullorEmpty()]
-        [array]$population
+        [array[]]$population
     )
     <#
     example fitness function
@@ -94,8 +94,8 @@ function GenerateFitnessValue_Population {
 
 function Roulette {
     param (
-        $population,
-        $fitness
+        [array[]]$population,
+        [array]$fitness
     )
     #5
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -138,8 +138,8 @@ function Roulette {
 
 function Tournament {
     param (
-        $population,
-        $fitness
+        [array[]]$population,
+        [array]$fitness
     )
     #5
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -215,7 +215,7 @@ function Tournament {
 }
 function Crossover {
     param (
-        $population,
+        [array[]]$population,
         $ChromosomeSize,
         $crossoverProb
     )
@@ -226,12 +226,12 @@ function Crossover {
         if (($Random.NextDouble()) -le $crossoverProb) { 
             $script:_crossover++    #9
             $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
-            [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
-            [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
+            [array[]]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
+            [array[]]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
         }
         else {
-            [array]$_crossoverpopulation += , ($population[$i])
-            [array]$_crossoverpopulation += , ($population[$i + 1])
+            [array[]]$_crossoverpopulation += , ($population[$i])
+            [array[]]$_crossoverpopulation += , ($population[$i + 1])
         }
     }    
     if ($Log) { Write-Log "$(Get-Date): Number of all crossovers in population: [$script:_crossover]" }   #9
@@ -241,7 +241,7 @@ function Crossover {
 }
 function Mutation {
     param (
-        $population,
+        [array[]]$population,
         $mutationProb
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -324,7 +324,7 @@ $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $
 if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
 if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
 if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
-[array]$allGenerations += , @(0, $fitnessPopulation, $population)
+[array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
 for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
     if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
@@ -359,7 +359,7 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
-    [array]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
+    [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
     if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
 }
