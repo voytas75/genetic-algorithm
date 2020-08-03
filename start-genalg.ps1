@@ -3,6 +3,7 @@ script for learning genetics algorithms
 # locus [łac.], genet. pozycja w chromosomie zajmowana przez dany gen;
 GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
+MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-math-net-numerics/
 #> 
 param (
     [bool]$log = $true,
