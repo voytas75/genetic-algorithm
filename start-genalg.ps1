@@ -95,7 +95,9 @@ function GenerateFitnessValue_Population {
 
 function Roulette {
     param (
+        [ValidateNotNullorEmpty()]
         [array[]]$population,
+        [ValidateNotNullorEmpty()]
         [array]$fitness
     )
     #5
@@ -139,7 +141,9 @@ function Roulette {
 
 function Tournament {
     param (
+        [ValidateNotNullorEmpty()]
         [array[]]$population,
+        [ValidateNotNullorEmpty()]
         [array]$fitness
     )
     #5
@@ -183,8 +187,11 @@ function Tournament {
 }
 function Crossover {
     param (
+        [ValidateNotNullorEmpty()]
         [array[]]$population,
+        [ValidateNotNullorEmpty()]
         $ChromosomeSize,
+        [ValidateNotNullorEmpty()]
         $crossoverProb
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -209,7 +216,9 @@ function Crossover {
 }
 function Mutation {
     param (
+        [ValidateNotNullorEmpty()]
         [array[]]$population,
+        [ValidateNotNullorEmpty()]
         $mutationProb
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
