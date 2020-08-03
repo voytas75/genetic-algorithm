@@ -379,9 +379,10 @@ $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] };
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
 $FitnessGain = (($allGenerations[$IndexBestGeneration][1] - $fitnessPopulationZero)/$fitnessPopulationZero)*100
+$FitnessGain = "{0:n2}" -f $FitnessGain
 if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
-write-output "Best generation: [$($IndexBestGeneration)]"
-
+Write-output "Best generation: [$($IndexBestGeneration)]"
+Write-output "Fitness gain: [$FitnessGain %]"
 <#
  Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
  PS2EXE:
