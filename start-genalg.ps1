@@ -144,21 +144,9 @@ function Tournament {
     #5
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $_Kindividuals = 4
-    #$_tournamentIndex = @()
     $_PopulationSize = PopulationStatictics -population $fitness -Count
-    #wybieramy indexy osobnikow do zawodow
-    #(1..$_Kindividuals).foreach{ [array]$_tournamentIndex += (0..($_PopulationSize - 1) | Get-Random -count 1) }
-    #return $_tournamentIndex
-    #Write-Output "-"
-    #$_tournamentIndex
-    #Write-Output "+"
-    #$population | 
-    #Get-Random -InputObject $population
     $_PopulationWinners = @()
     for ($ii = 0; $ii -lt $_PopulationSize; $ii++) {
-        #convert $population to hash table
-        #Write-Output "array"
-        #$population.foreach{ "$_" }
         $_population_hashtable_temp = @{}
         $_populationHashTable = @{}
         $i = 0
@@ -166,34 +154,14 @@ function Tournament {
         $_populationHashTable = ($population).foreach{ $_population_hashtable_temp + @{item = $i; genome = $_; fitness = $fitness[$i] }; $i++ }
         #get items to tournament
         $_TournamentPlayers = get-random -InputObject $_populationHashTable -count $_Kindividuals 
-        #Write-Output "hash table"
-        #$population_hashtable | Export-Clixml -Path population_hashtable.xml
-    
-        #$_popuationHashTable
-        #Write-Output "hash table"
-        #$_TournamentPlayers
-        #    Write-Output "hash table"
-        #    $_TournamentPlayers[0]
-        #Write-Output "hash table sorted by fitness"
-
-        #$_TournamentPlayers | Export-Clixml -path _TournamentPlayers.xml
-
         #sort items by fitness
         $_TournamentPlayers_SortFitness = $_TournamentPlayers.GetEnumerator() | Sort-Object -property { $_.fitness } -descending
-        #$_TournamentPlayers_SortFitness.getenumerator() 
-        #Write-Output "hash table sorted by fitness First"
         $_TurnamentWinner = @{}
         # sorting items by fitness and take first one
         $_TurnamentWinner = $_TournamentPlayers_SortFitness | Select-Object -first 1
-        #Write-Output "Winner hashtable"
-        #$_TurnamentWinner
-        #Write-Output "Winner array"
-        #"$($population[$_TurnamentWinner.item])"
         #building Tournament winner as population to mutate
         $_PopulationWinners += , ($population[$_TurnamentWinner.item])
     }
-    #Write-Output "Winner's array"
-    #$_PopulationWinners.foreach{"[$_]"}
     #5
     $script:_functionExecutionTime = $MeasureFunction.ElapsedMilliseconds
     if ($Log) { Write-Log "$(Get-Date): Selection 'Tournament' execution time: ($script:_functionExecutionTime ms)" }
@@ -208,7 +176,6 @@ function Tournament {
     $i=0
     ($population).foreach{$d[$i]=$_;$i++}
     #>
-
 
     #$population | Export-Clixml -Path poulation.xml
     #$fitness | Export-Clixml -Path fitness.xml
@@ -255,7 +222,6 @@ function Mutation {
                 #we are in! mutation time! Lets change some genes!
                 #4
                 $script:m++
-                #Write-Information -MessageData "mutacja: ($m)" -InformationAction Continue
                 if ($population[$i][$j] -eq 1) {
                     $population[$i][$j] = 0
                     if ($Log) { Write-Log "$(Get-Date): Mutation! Item [$i], Gene [$j] 1 -> 0" }
@@ -264,13 +230,11 @@ function Mutation {
                     $population[$i][$j] = 1
                     if ($Log) { Write-Log "$(Get-Date): Mutation! Item [$i], Gene [$j] 0 -> 1" }
                 }
-
             }    
             $j++
         }
         $i++
     }
-    #Write-Information -MessageData "Liczba wszstkich mutacji w populacji: [$m]" -InformationAction Continue
     if ($Log) { Write-Log "$(Get-Date): Number of all mutations in population: [$script:m]" }
     #5
     $script:_functionExecutionTime = $MeasureFunction.ElapsedMilliseconds
@@ -295,7 +259,6 @@ if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
 new-variable -scope script -name m -Value 0
 #9
 new-variable -scope script -name _crossover -Value 0
-
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
 $_selectionDictionary = @("Roulette", "Tournament")
@@ -373,12 +336,10 @@ if ($Log) { Write-Log "$(Get-Date): Global selection execution time: [$_Selectio
 if ($Log) { Write-Log "$(Get-Date): Global crossover execution time: [$_CrossoverGlobalExecutionTime ms]" }
 if ($Log) { Write-Log "$(Get-Date): Global mutation execution time: [$_MutationGlobalExecutionTime ms]" }
 
-
-
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
 if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
-$FitnessGain = (($allGenerations[$IndexBestGeneration][1] - $fitnessPopulationZero)/$fitnessPopulationZero)*100
+$FitnessGain = (($allGenerations[$IndexBestGeneration][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
 $FitnessGain = "{0:n2}" -f $FitnessGain
 if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
 Write-output "Best generation: [$($IndexBestGeneration)]"
@@ -387,23 +348,12 @@ Write-output "Fitness gain: [$FitnessGain %]"
  Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
  PS2EXE:
  Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
- #>
-
-
-#$allGenerations[$IndexBestGeneration][2].foreach{ "[$psitem]" }
-#$allGenerations[$generations][0]
-#$allGenerations[$generations][1]
-#($allGenerations[$generations][2]).foreach{ "{$psitem}" }
-#($allGenerations[$generations].ForEach{$psitem}).foreach{$PSItem} | Out-GridView
-#$allGenerations | Out-GridView
-#$allGenerations.foreach{$psitem[1]} | export-excel -Path "c:\temp\ga.xlsx" -barchart -autofilter -show
-
+#>
 
 <#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
 barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
-
 
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
