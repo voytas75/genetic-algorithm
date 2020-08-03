@@ -320,7 +320,7 @@ if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 $populationFitnessValue = GenerateFitnessValue_Population -population $population
 $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
 $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
-$fitnessPopulation = PopulationStatictics -population $population -fitness
+$fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
 if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
 if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
 if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
@@ -377,7 +377,9 @@ if ($Log) { Write-Log "$(Get-Date): Global mutation execution time: [$_MutationG
 
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
 if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
-if ($Log) { Write-Log "$(Get-Date): highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
+if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
+$FitnessGain = (($allGenerations[$IndexBestGeneration][1] - $fitnessPopulationZero)/$fitnessPopulationZero)*100
+if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
 write-output "Best generation: [$($IndexBestGeneration)]"
 
 <#
