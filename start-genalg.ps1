@@ -358,8 +358,8 @@ barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's 
 
 #$cd = New-ExcelChartDefinition -
 #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-#$cd = New-ExcelChartDefinition -xrange "test" -ChartType ColumnClustered -ChartTrendLine Linear 
-#$allGenerations.foreach{$psitem[1]} | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
+#$cd = New-ExcelChartDefinition -ChartType ColumnClustered -ChartTrendLine Linear
+#$allGenerations.foreach{$psitem[1]} | Export-Excel -ExcelChartDefinition $cd -Show
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
 if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
