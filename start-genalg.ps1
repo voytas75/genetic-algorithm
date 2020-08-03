@@ -6,11 +6,11 @@ PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell
 #> 
 param (
     [bool]$log = $true,
-    $generations = 5,
-    $PopulationSize = 160,
-    $ChromosomeSize = 40,
+    $generations = 10,
+    $PopulationSize = 10,
+    $ChromosomeSize = 10,
     $CrossOverProbability = 0.6,
-    $MutationProbability = 0.0009
+    $MutationProbability = 0.003
 )
 
 function generateChromosome {
