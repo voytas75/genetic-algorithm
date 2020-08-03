@@ -220,9 +220,11 @@ function Crossover {
         $crossoverProb
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
+    $script:_crossover = 0  #9
     [Object]$Random = New-Object System.Random
     for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
         if (($Random.NextDouble()) -le $crossoverProb) { 
+            $script:_crossover++    #9
             $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
             [array]$_crossoverpopulation += , ($population[$i][0..$_crossoverPoint] + $population[$i + 1][($_crossoverPoint + 1)..($ChromosomeSize)]) 
             [array]$_crossoverpopulation += , ($population[$i + 1][0..$_crossoverPoint] + $population[$i][($_crossoverPoint + 1)..($ChromosomeSize)])
@@ -232,6 +234,7 @@ function Crossover {
             [array]$_crossoverpopulation += , ($population[$i + 1])
         }
     }    
+    if ($Log) { Write-Log "$(Get-Date): Number of all crossovers in population: [$script:_crossover]" }   #9
     $script:_functionExecutionTime = $MeasureFunction.ElapsedMilliseconds
     if ($Log) { Write-Log "$(Get-Date): Crossover execution time: ($script:_functionExecutionTime ms)" }
     return $_CrossoverPopulation
@@ -290,11 +293,15 @@ else {
 if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
 #4
 new-variable -scope script -name m -Value 0
+#9
+new-variable -scope script -name _crossover -Value 0
+
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
 $_selectionDictionary = @("Roulette", "Tournament")
 $selection = $_selectionDictionary[0]
-$_mutations = 0
+$_crossoverGlobalCount = 0      #9
+$_mutations = 0     #4
 $_SelectionGlobalExecutionTime = 0
 $_CrossoverGlobalExecutionTime = 0
 $_MutationGlobalExecutionTime = 0
@@ -337,6 +344,8 @@ for ($i = 1; $i -le $generations; $i++) {
     $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
     $_CrossoverGlobalExecutionTime = $_CrossoverGlobalExecutionTime + $script:_functionExecutionTime
     $script:_functionExecutionTime = 0
+    #9
+    $_crossoverGlobalCount = $_crossoverGlobalCount + $script:_crossover
     if ($Log) { Write-Log "$(Get-Date): Mutating." }
     $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
     $_MutationGlobalExecutionTime = $_MutationGlobalExecutionTime + $script:_functionExecutionTime
@@ -355,6 +364,8 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
 }
 if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
+#9
+if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
 #4
 if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
 #5
