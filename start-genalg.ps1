@@ -4,6 +4,7 @@ script for learning genetics algorithms
 GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-math-net-numerics/
+charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
 #> 
 param (
     [bool]$log = $true,
