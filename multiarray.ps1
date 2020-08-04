@@ -1,6 +1,9 @@
 #https://rosettacode.org/wiki/Matrix_multiplication#PowerShell
 function multarrays($a, $b) {
     $n,$m,$p = ($a.Count - 1), ($b.Count - 1), ($b[0].Count - 1)
+    $n
+    $m
+    $p
     if ($a[0].Count -ne $b.Count) {throw "Multiplication impossible"}
     $c = @(0)*($a[0].Count)
     foreach ($i in 0..$n) {    
@@ -15,9 +18,9 @@ function multarrays($a, $b) {
 
  function show($a) { $a | foreach{"$_"}}
  
-$a = @(@(1,2),@(3,4))
-$b = @(@(5,6),@(7,8))
-$c = @(5,6)
+$a = @(@(2,3,3),@(2,2,2),@(2,2,2))
+$b = @(@(2,3,2),@(4,3,2),@(2,2,2))
+$c = @(4,2,3)
 "`$a ="
 show $a
 ""
