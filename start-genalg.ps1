@@ -29,14 +29,15 @@ function generateChromosome {
     check .net statistics 
     #>
     $_chromosome = @()
-    if($zeros) {
+    if ($zeros) {
         return [array]$_chromosome = (1..$genecount).foreach{ 0 } 
 
-    } else {
+    }
+    else {
         return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
     
     }
-    }
+}
 
 function generatePopulation {
     [CmdletBinding()]
@@ -54,10 +55,11 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    if($zeros) {
+    if ($zeros) {
         (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -zeros -geneCount $geneCount) }
 
-    } else {
+    }
+    else {
         (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
 
     }
@@ -124,18 +126,23 @@ function Roulette {
     $_NormalizeItem = @()
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
-    if (-not $_FitnessSum -and -not $zeros) {
+    #13
+    if ($_FitnessSum -eq 0 -and -not $zeros) {
         #$_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
         #$population.foreach{ "Population item: [$PSItem]" }
         #"[STOP]"
+        #14
+        if ($Log) { Write-Log "$(Get-Date): [EXIT] Fitness is 0. Terminating." }
+        if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
+        Write-output "[EXIT] Fitness is 0. Terminating."
         exit
     }
-    if (-not $zeros) {
+    elseif ($_FitnessSum -gt 0) {
         $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
-    
-    } else {
-        $_NormalizeItem = $fitness.foreach{ 0 }
     }
+    elseif ($_FitnessSum -eq 0 -and $zeros) {
+        $_NormalizeItem = $fitness.foreach{ 0 }
+    } 
     [array]$AgregateSum = $_NormalizeItem.foreach{ $_aggregatesum += $PSItem; $_aggregatesum }
     [Object]$Random = New-Object System.Random
     [int]$_popcount = PopulationStatictics -population $population -count
@@ -312,7 +319,8 @@ if ($Log) {
 }
 if ($zeros) {
     [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-}else{
+}
+else {
     [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
 }
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
@@ -325,7 +333,8 @@ if ($zeros) {
     $fitnessPopulation_max = 0
     $fitnessPopulation_avg = 0
     $fitnessPopulationZero = $fitnessPopulation = 0
-}else{
+}
+else {
     $populationFitnessValue = GenerateFitnessValue_Population -population $population
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
@@ -398,7 +407,8 @@ if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fi
 if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
 if ($zeros) {
     $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) * 100)
-}else {
+}
+else {
     $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
 }
 
@@ -470,15 +480,15 @@ $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
 
 $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
 if ($ShowChart) {
-# display the chart on a form
-$Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
-$Form = New-Object Windows.Forms.Form
-$Form.Text = "PowerShell Chart"
-$Form.Width = 1100
-$Form.Height = 600
-$Form.controls.add($Chart)
-$Form.Add_Shown( { $Form.Activate() })
-#$Form.controls.add($SaveButton)
-$Form.ShowDialog()
+    # display the chart on a form
+    $Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+    $Form = New-Object Windows.Forms.Form
+    $Form.Text = "PowerShell Chart"
+    $Form.Width = 1100
+    $Form.Height = 600
+    $Form.controls.add($Chart)
+    $Form.Add_Shown( { $Form.Activate() })
+    #$Form.controls.add($SaveButton)
+    $Form.ShowDialog()
 }
 "PNG: $env:TEMP\GA.png" 
