@@ -7,7 +7,6 @@ MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-m
 charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
 #> 
 param (
-    [switch]$log,
     $generations = 2,
     [ValidateScript( {
             if ($_ -eq 0) {
@@ -24,6 +23,7 @@ param (
     $ChromosomeSize = 29,
     $CrossOverProbability = 0.6,
     $MutationProbability = 0.001,
+    [switch]$log,
     [switch]$zeros,
     [switch]$ShowChart
 )
