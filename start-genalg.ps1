@@ -126,7 +126,7 @@ function Roulette {
     $_NormalizeItem = @()
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
-    #13
+    #13 #15
     if ($_FitnessSum -eq 0 -and -not $zeros) {
         #$_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
         #$population.foreach{ "Population item: [$PSItem]" }
