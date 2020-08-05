@@ -287,7 +287,9 @@ function Mutation {
     if ($Log) { Write-Log "$(Get-Date): Mutation execution time: ($script:_functionExecutionTime ms)" }
     return $population
 }
-# MAIN CODE
+#############################
+# MAIN CODE                 #
+#############################
 $MeasureScript = [system.diagnostics.stopwatch]::startnew()
 
 #7
@@ -329,7 +331,7 @@ else {
 }
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
 #11
-if ($zeros) { Write-Log "$(Get-Date): Used param '-zeros'. Population with all genes = 0." }
+if ($zeros -and $log) { Write-Log "$(Get-Date): Used param '-zeros'. Population with all genes = 0." }
 
 if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 if ($zeros) {
