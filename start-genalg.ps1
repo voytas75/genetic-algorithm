@@ -312,27 +312,23 @@ if ($Log) {
 }
 if ($zeros) {
     [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-    Write-Log "$(Get-Date): Initial generation has all genes 0." 
-
 }else{
     [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-
 }
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
-if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
+if ($zeros) { Write-Log "$(Get-Date): Initial generation has all genes 0." }
 
+if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 if ($zeros) {
-    #$populationFitnessValue = GenerateFitnessValue_Population -population $population
+    $populationFitnessValue = GenerateFitnessValue_Population -population $population
     $fitnessPopulation_max = 0
     $fitnessPopulation_avg = 0
     $fitnessPopulationZero = $fitnessPopulation = 0
-    
 }else{
     $populationFitnessValue = GenerateFitnessValue_Population -population $population
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
     $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
-   
 }
 if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
 if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
