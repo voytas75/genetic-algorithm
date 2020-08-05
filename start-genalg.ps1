@@ -316,7 +316,8 @@ if ($zeros) {
     [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
 }
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
-if ($zeros) { Write-Log "$(Get-Date): Initial generation has all genes 0." }
+#11
+if ($zeros) { Write-Log "$(Get-Date): Used param '-zeros'. Population with all genes = 0." }
 
 if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 if ($zeros) {
