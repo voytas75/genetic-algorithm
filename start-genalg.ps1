@@ -8,17 +8,19 @@ charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_ma
 #> 
 param (
     [bool]$log = $true,
-    $generations = 10,
-    $PopulationSize = 10,
-    $ChromosomeSize = 10,
+    $generations = 2,
+    $PopulationSize = 50,
+    $ChromosomeSize = 29,
     $CrossOverProbability = 0.6,
-    $MutationProbability = 0.003
+    $MutationProbability = 0.001,
+    [switch]$zeros
 )
 
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 6
+        [int]$geneCount = 6,
+        [switch]$zeros
     )
     <#
     function generate vale of gene
@@ -26,8 +28,14 @@ function generateChromosome {
     check .net statistics 
     #>
     $_chromosome = @()
-    return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
-}
+    if($zeros) {
+        return [array]$_chromosome = (1..$genecount).foreach{ 0 } 
+
+    } else {
+        return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
+    
+    }
+    }
 
 function generatePopulation {
     [CmdletBinding()]
@@ -35,7 +43,8 @@ function generatePopulation {
         [ValidateNotNullorEmpty()]
         [int]$chromosomeCount = 10,
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 10
+        [int]$geneCount = 10,
+        [switch]$zeros
     )
     <# 
     function generates chromosome one or more. 
@@ -44,7 +53,13 @@ function generatePopulation {
     # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
-    (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
+    if($zeros) {
+        (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -zeros -geneCount $geneCount) }
+
+    } else {
+        (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
+
+    }
     return $_population
 }
 
@@ -108,13 +123,18 @@ function Roulette {
     $_NormalizeItem = @()
     $_aggregatesum = 0
     $fitness.foreach{ $_FitnessSum += $PSItem }
-    if (-not $_FitnessSum) {
+    if (-not $_FitnessSum -and -not $zeros) {
         #$_FitnessSum.foreach{ "Fitness sum: [$PSItem]" }
         #$population.foreach{ "Population item: [$PSItem]" }
         #"[STOP]"
         exit
     }
-    $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
+    if (-not $zeros) {
+        $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
+    
+    } else {
+        $_NormalizeItem = $fitness.foreach{ 0 }
+    }
     [array]$AgregateSum = $_NormalizeItem.foreach{ $_aggregatesum += $PSItem; $_aggregatesum }
     [Object]$Random = New-Object System.Random
     [int]$_popcount = PopulationStatictics -population $population -count
@@ -198,6 +218,7 @@ function Crossover {
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $script:_crossover = 0  #9
     [Object]$Random = New-Object System.Random
+    #Get-Random -Minimum 0.0 -maximum 1.0
     for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
         if (($Random.NextDouble()) -le $crossoverProb) { 
             $script:_crossover++    #9
@@ -224,6 +245,8 @@ function Mutation {
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     [Object]$Random = New-Object System.Random
+    #Get-Random -Minimum 0.0 -maximum 1.0
+
     $i = 0
     $script:m = 0
     foreach ($items in $population) {
@@ -286,8 +309,13 @@ if ($Log) {
     Write-Log "$(Get-Date): Crossover probability: [$($CrossOverProbability)]" 
     Write-Log "$(Get-Date): Mutation probability: [$($MutationProbability)]" 
 }
+if ($zeros) {
+    [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
 
-[array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+}else{
+    [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+
+}
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
 if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 
@@ -298,6 +326,8 @@ $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $
 if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
 if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
 if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
+$IndexBestGeneration_2 = 0
+$fitnessPopulationZero_2 = $fitnessPopulationZero
 [array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
 for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation = 0
@@ -333,9 +363,15 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
+    if ($fitnessPopulationZero_2 -lt $fitnessPopulation) {
+        # first generation index with max
+        $IndexBestGeneration_2 = $i
+        $fitnessPopulationZero_2 = $fitnessPopulation
+    }
     [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
     $population = $mutedPopulation
     if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
+    Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
 }
 if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
 #9
@@ -348,12 +384,21 @@ if ($Log) { Write-Log "$(Get-Date): Global crossover execution time: [$_Crossove
 if ($Log) { Write-Log "$(Get-Date): Global mutation execution time: [$_MutationGlobalExecutionTime ms]" }
 
 $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
-if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$($IndexBestGeneration)]" }
+if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration]" }
+if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration_2]" }
+
 if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
-$FitnessGain = (($allGenerations[$IndexBestGeneration][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
+if ($zeros) {
+    $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) * 100)
+}else {
+    $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
+}
+
+
 $FitnessGain = "{0:n2}" -f $FitnessGain
 if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
-Write-output "Best generation: [$($IndexBestGeneration)]"
+Write-output "Best generation: [$IndexBestGeneration_2]"
+Write-output "Best generation: [$IndexBestGeneration]"
 Write-output "Fitness gain: [$FitnessGain %]"
 <#
  Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
@@ -361,9 +406,9 @@ Write-output "Fitness gain: [$FitnessGain %]"
  Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
 #>
 
-<#
+#<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
-barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
+#barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
 
 #$cd = New-ExcelChartDefinition -
@@ -373,3 +418,58 @@ barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's 
 #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
 if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
 if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
+if ($Log) { "LOG: $env:TEMP\GA.log" }
+
+# CHART
+# load the appropriate assemblies
+[void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+[void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms.DataVisualization")
+
+# create chart object
+$Chart = New-object System.Windows.Forms.DataVisualization.Charting.Chart
+$Chart.Width = 1000
+$Chart.Height = 400
+$Chart.Left = 40
+$Chart.Top = 30
+
+# create a chartarea to draw on and add to chart
+$ChartArea = New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea
+$Chart.ChartAreas.Add($ChartArea)
+
+# add data to chart
+$Cities = @{London = 7556900; Berlin = 3429900; Madrid = 3213271; Rome = 2726539; Paris = 2188500 }
+[void]$Chart.Series.Add("Data")
+$gg = 0
+$Chart.Series["Data"].Points.DataBindXY([int[]]$AllGenerationFitness.foreach{ , ($gg++) }, [int[]]$AllGenerationFitness )
+
+# Find point with max/min values and change their colour
+$maxValuePoint = $Chart.Series["Data"].Points.FindMaxByValue()
+$maxValuePoint.Color = [System.Drawing.Color]::Red
+
+$minValuePoint = $Chart.Series["Data"].Points.FindMinByValue()
+$minValuePoint.Color = [System.Drawing.Color]::Green
+
+# change chart area colour
+#$Chart.BackColor = [System.Drawing.Color]::Transparent
+
+# add a save button
+$SaveButton = New-Object Windows.Forms.Button
+$SaveButton.Text = "Save"
+$SaveButton.Top = 500
+$SaveButton.Left = 450
+$SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right
+$SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
+
+$Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
+
+# display the chart on a form
+#$Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+#$Form = New-Object Windows.Forms.Form
+#$Form.Text = "PowerShell Chart"
+#$Form.Width = 600
+#$Form.Height = 600
+#$Form.controls.add($Chart)
+#$Form.Add_Shown( { $Form.Activate() })
+#$Form.controls.add($SaveButton)
+#$Form.ShowDialog()
+"PNG: $env:TEMP\GA.png" 
