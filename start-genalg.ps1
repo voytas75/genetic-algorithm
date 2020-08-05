@@ -386,8 +386,8 @@ for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-    PopulationStatictics -population $mutedPopulation -display
-    " "
+    #PopulationStatictics -population $mutedPopulation -display
+    #" "
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
@@ -401,6 +401,7 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
     Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
 }
+$allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
 if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
 #9
 if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
@@ -427,7 +428,7 @@ else {
 $FitnessGain = "{0:n2}" -f $FitnessGain
 if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
 Write-output "Best generation: [$IndexBestGeneration_2]"
-Write-output "Best generation: [$IndexBestGeneration]"
+#Write-output "Best generation: [$IndexBestGeneration]"
 Write-output "Fitness gain: [$FitnessGain %]"
 <#
  Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
@@ -448,7 +449,9 @@ $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
 if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
 if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
 if ($Log) { "LOG: $env:TEMP\GA.log" }
-
+#10
+$allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
+"OUT DATA: $env:TEMP\allGenerations.log"
 # CHART
 # load the appropriate assemblies
 [void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
