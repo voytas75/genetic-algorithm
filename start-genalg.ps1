@@ -13,7 +13,8 @@ param (
     $ChromosomeSize = 29,
     $CrossOverProbability = 0.6,
     $MutationProbability = 0.001,
-    [switch]$zeros
+    [switch]$zeros,
+    [switch]$ShowChart
 )
 
 function generateChromosome {
@@ -311,6 +312,7 @@ if ($Log) {
 }
 if ($zeros) {
     [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+    Write-Log "$(Get-Date): Initial generation has all genes 0." 
 
 }else{
     [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
@@ -319,10 +321,19 @@ if ($zeros) {
 if ($Log) { Write-Log "$(Get-Date): Population was generated." }
 if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
 
-$populationFitnessValue = GenerateFitnessValue_Population -population $population
-$fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
-$fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
-$fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
+if ($zeros) {
+    #$populationFitnessValue = GenerateFitnessValue_Population -population $population
+    $fitnessPopulation_max = 0
+    $fitnessPopulation_avg = 0
+    $fitnessPopulationZero = $fitnessPopulation = 0
+    
+}else{
+    $populationFitnessValue = GenerateFitnessValue_Population -population $population
+    $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
+    $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
+    $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
+   
+}
 if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
 if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
 if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
@@ -461,15 +472,16 @@ $SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Wi
 $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
 
 $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
-
+if ($ShowChart) {
 # display the chart on a form
-#$Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
-#$Form = New-Object Windows.Forms.Form
-#$Form.Text = "PowerShell Chart"
-#$Form.Width = 600
-#$Form.Height = 600
-#$Form.controls.add($Chart)
-#$Form.Add_Shown( { $Form.Activate() })
+$Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+$Form = New-Object Windows.Forms.Form
+$Form.Text = "PowerShell Chart"
+$Form.Width = 1100
+$Form.Height = 600
+$Form.controls.add($Chart)
+$Form.Add_Shown( { $Form.Activate() })
 #$Form.controls.add($SaveButton)
-#$Form.ShowDialog()
+$Form.ShowDialog()
+}
 "PNG: $env:TEMP\GA.png" 
