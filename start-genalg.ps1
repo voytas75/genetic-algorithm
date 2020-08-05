@@ -23,11 +23,12 @@ param (
     $ChromosomeSize = 29,
     $CrossOverProbability = 0.6,
     $MutationProbability = 0.001,
+    [Validateset("Roulette", "Tournament")]
+    $selection = "Roulette",
     [switch]$log,
     [switch]$zeros,
     [switch]$ShowChart
 )
-
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
@@ -344,8 +345,8 @@ new-variable -scope script -name m -Value 0
 new-variable -scope script -name _crossover -Value 0
 #5
 New-Variable -Scope script -Name _functionExecutionTime -Value 0
-$_selectionDictionary = @("Roulette", "Tournament")
-$selection = $_selectionDictionary[0]
+#$_selectionDictionary = @("Roulette", "Tournament")
+#$selection = $_selectionDictionary[0]
 $_crossoverGlobalCount = 0      #9
 $_mutations = 0     #4
 $_SelectionGlobalExecutionTime = 0
