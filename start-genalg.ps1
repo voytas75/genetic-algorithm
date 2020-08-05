@@ -9,6 +9,17 @@ charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_ma
 param (
     [switch]$log,
     $generations = 2,
+    [ValidateScript( {
+            if ($_ -eq 0) {
+                throw "Population size can not be [$_]!"
+            }
+            elseif ($_ -gt 0 -and ($_ % 2) -ne 0 ) {
+                throw "Population size [$_] is not even!"
+            }
+            else {
+                $true
+            }
+        })]
     $PopulationSize = 50,
     $ChromosomeSize = 29,
     $CrossOverProbability = 0.6,
