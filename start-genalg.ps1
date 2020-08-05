@@ -444,7 +444,7 @@ $ChartArea = New-Object System.Windows.Forms.DataVisualization.Charting.ChartAre
 $Chart.ChartAreas.Add($ChartArea)
 
 # add data to chart
-$Cities = @{London = 7556900; Berlin = 3429900; Madrid = 3213271; Rome = 2726539; Paris = 2188500 }
+#$Cities = @{London = 7556900; Berlin = 3429900; Madrid = 3213271; Rome = 2726539; Paris = 2188500 }
 [void]$Chart.Series.Add("Data")
 $gg = 0
 $Chart.Series["Data"].Points.DataBindXY([int[]]$AllGenerationFitness.foreach{ , ($gg++) }, [int[]]$AllGenerationFitness )
