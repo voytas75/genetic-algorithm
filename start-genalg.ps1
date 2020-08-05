@@ -73,7 +73,8 @@ function PopulationStatictics {
         [switch]$Count,
         [switch]$fitness,
         [switch]$Maximum,
-        [switch]$Average        
+        [switch]$Average,
+        [switch]$display        
     )
     <# 
     param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
@@ -92,6 +93,8 @@ function PopulationStatictics {
     }
     elseif ($Average) {
         return $population.count
+    }elseif ($display) {
+        $population.foreach{"[$_]"}
     }
     else {
         return $null
@@ -383,6 +386,8 @@ for ($i = 1; $i -le $generations; $i++) {
     $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
     $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
     $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
+    PopulationStatictics -population $mutedPopulation -display
+    " "
     if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
     if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
     if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
