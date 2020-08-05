@@ -117,7 +117,9 @@ function Roulette {
         [ValidateNotNullorEmpty()]
         [array[]]$population,
         [ValidateNotNullorEmpty()]
-        [array]$fitness
+        [array]$fitness,
+        $_PopulationSize,
+        $_ChromosomeSize
     )
     #5
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
@@ -141,7 +143,9 @@ function Roulette {
         $_NormalizeItem = $fitness.foreach{ $Psitem / $_FitnessSum }
     }
     elseif ($_FitnessSum -eq 0 -and $zeros) {
-        $_NormalizeItem = $fitness.foreach{ 0 }
+        #$_NormalizeItem = $fitness.foreach{ 0 }
+        #16
+        return (generatePopulation -zeros -chromosomeCount $_PopulationSize -geneCount $_ChromosomeSize)
     } 
     [array]$AgregateSum = $_NormalizeItem.foreach{ $_aggregatesum += $PSItem; $_aggregatesum }
     [Object]$Random = New-Object System.Random
@@ -352,7 +356,7 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Selection." }
     switch ($selection) {
         "roulette" {         
-            $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue
+            $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue -_PopulationSize $populationSize -_ChromosomeSize $ChromosomeSize
         }
         "tournament" {
             $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
