@@ -43,14 +43,11 @@ function generateChromosome {
     $_chromosome = @()
     if ($zeros) {
         return [array]$_chromosome = (1..$genecount).foreach{ 0 } 
-
     }
     else {
         return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
-    
     }
 }
-
 function generatePopulation {
     [CmdletBinding()]
     param (
@@ -69,15 +66,12 @@ function generatePopulation {
     $_population = @()
     if ($zeros) {
         (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -zeros -geneCount $geneCount) }
-
     }
     else {
         (1..$chromosomeCount).foreach{ $_population += , [array](generateChromosome -geneCount $geneCount) }
-
     }
     return $_population
 }
-
 function PopulationStatictics {
     param (
         [ValidateNotNullorEmpty()]
@@ -113,7 +107,6 @@ function PopulationStatictics {
         return $null
     }
 }
-
 function GenerateFitnessValue_Population {
     param (
         [ValidateNotNullorEmpty()]
@@ -127,7 +120,6 @@ function GenerateFitnessValue_Population {
     $_GenerateSumGenes = $population.ForEach{ ($_ -match 1).count } # array of sums 1 in genes
     return [array]$_FitnessPopulationItems = $_GenerateSumGenes.foreach{ if ([bool]($psitem % 2)) { $PSItem }else { 0 } }
 }
-
 function Roulette {
     param (
         [ValidateNotNullorEmpty()]
@@ -189,7 +181,6 @@ function Roulette {
     if ($Log) { Write-Log "$(Get-Date): Selection 'Roulette' execution time: ($script:_functionExecutionTime ms)" }
     return $_reproduceItems
 }
-
 function Tournament {
     param (
         [ValidateNotNullorEmpty()]
