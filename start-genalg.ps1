@@ -7,7 +7,7 @@ MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-m
 charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
 #> 
 param (
-    [bool]$log = $true,
+    [switch]$log,
     $generations = 2,
     $PopulationSize = 50,
     $ChromosomeSize = 29,
