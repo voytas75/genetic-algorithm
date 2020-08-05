@@ -93,8 +93,9 @@ function PopulationStatictics {
     }
     elseif ($Average) {
         return $population.count
-    }elseif ($display) {
-        $population.foreach{"[$_]"}
+    }
+    elseif ($display) {
+        $population.foreach{ "[$_]" }
     }
     else {
         return $null
@@ -121,7 +122,7 @@ function Roulette {
         [array[]]$population,
         [ValidateNotNullorEmpty()]
         [array]$fitness,
-        $_PopulationSize,
+        $Population_Size,
         $_ChromosomeSize
     )
     #5
@@ -148,11 +149,13 @@ function Roulette {
     elseif ($_FitnessSum -eq 0 -and $zeros) {
         #$_NormalizeItem = $fitness.foreach{ 0 }
         #16
-        return (generatePopulation -zeros -chromosomeCount $_PopulationSize -geneCount $_ChromosomeSize)
+        return (generatePopulation -zeros -chromosomeCount $Population_Size -geneCount $_ChromosomeSize)
     } 
     [array]$AgregateSum = $_NormalizeItem.foreach{ $_aggregatesum += $PSItem; $_aggregatesum }
     [Object]$Random = New-Object System.Random
-    [int]$_popcount = PopulationStatictics -population $population -count
+    #17
+    #[int]$_popcount = PopulationStatictics -population $population -count
+    [int]$_popcount = $Population_Size
     [array]$_randomvalue = (1..$_popcount).foreach{ $Random.NextDouble() }
     $i = $j = 0
     $_reproduceItems = @()
@@ -180,13 +183,17 @@ function Tournament {
         [ValidateNotNullorEmpty()]
         [array[]]$population,
         [ValidateNotNullorEmpty()]
-        [array]$fitness
+        [array]$fitness,
+        $Population_Size
     )
     #5
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $_Kindividuals = 4
-    $_PopulationSize = PopulationStatictics -population $fitness -Count
+    #17
+    #$_PopulationSize
+    #$_PopulationSize = PopulationStatictics -population $fitness -Count
     $_PopulationWinners = @()
+    $_PopulationSize = $Population_Size
     for ($ii = 0; $ii -lt $_PopulationSize; $ii++) {
         $_population_hashtable_temp = @{}
         $_populationHashTable = @{}
@@ -228,13 +235,17 @@ function Crossover {
         [ValidateNotNullorEmpty()]
         $ChromosomeSize,
         [ValidateNotNullorEmpty()]
-        $crossoverProb
+        $crossoverProb,
+        $Population_Size
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $script:_crossover = 0  #9
     [Object]$Random = New-Object System.Random
     #Get-Random -Minimum 0.0 -maximum 1.0
-    for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
+    #17
+    #for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
+    $_PopulationSize = $Population_Size
+    for ($i = 0; $i -lt $_PopulationSize; $i += 2) {
         if (($Random.NextDouble()) -le $crossoverProb) { 
             $script:_crossover++    #9
             $_crossoverPoint = 1..($ChromosomeSize - 2) | get-random
@@ -290,9 +301,17 @@ function Mutation {
     if ($Log) { Write-Log "$(Get-Date): Mutation execution time: ($script:_functionExecutionTime ms)" }
     return $population
 }
+
+
+
+
+
 #############################
 # MAIN CODE                 #
 #############################
+
+
+
 $MeasureScript = [system.diagnostics.stopwatch]::startnew()
 
 #7
@@ -303,6 +322,8 @@ else {
     write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'."
 }
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
+
+# import function
 . .\Write-Log.ps1
 
 if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
@@ -361,17 +382,17 @@ for ($i = 1; $i -le $generations; $i++) {
     if ($Log) { Write-Log "$(Get-Date): Selection." }
     switch ($selection) {
         "roulette" {         
-            $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue -_PopulationSize $populationSize -_ChromosomeSize $ChromosomeSize
+            $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue -Population_Size $populationSize -_ChromosomeSize $ChromosomeSize
         }
         "tournament" {
-            $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue
+            $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue -Population_Size $populationSize
         }
         Default {}
     }
     $_SelectionGlobalExecutionTime = $_SelectionGlobalExecutionTime + $script:_functionExecutionTime
     $script:_functionExecutionTime = 0
     if ($Log) { Write-Log "$(Get-Date): Crossover." }
-    $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability
+    $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability -Population_Size $populationSize
     $_CrossoverGlobalExecutionTime = $_CrossoverGlobalExecutionTime + $script:_functionExecutionTime
     $script:_functionExecutionTime = 0
     #9
