@@ -7,7 +7,7 @@ MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-m
 charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
 #> 
 param (
-    [int]$generations = 15,
+    [int]$generations = 20,
     [ValidateScript( {
             if ($_ -eq 0) {
                 throw "Population size can not be [$_]!"
@@ -19,8 +19,8 @@ param (
                 $true
             }
         })]
-    [int]$PopulationSize = 50,
-    [int]$ChromosomeSize = 30,
+    [int]$PopulationSize = 30,
+    [int]$ChromosomeSize = 20,
     [double]$CrossOverProbability = 0.6,
     [double]$MutationProbability = 0.001,
     [Validateset("Roulette", "Tournament")]
@@ -33,7 +33,7 @@ param (
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 6,
+        [int]$geneCount,    #18
         [switch]$zeros
     )
     <#
@@ -53,9 +53,9 @@ function generatePopulation {
     [CmdletBinding()]
     param (
         [ValidateNotNullorEmpty()]
-        [int]$chromosomeCount = 10,
+        [int]$chromosomeCount,  #18
         [ValidateNotNullorEmpty()]
-        [int]$geneCount = 10,
+        [int]$geneCount,    #18
         [switch]$zeros
     )
     <# 
