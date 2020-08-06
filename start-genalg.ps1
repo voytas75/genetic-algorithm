@@ -329,7 +329,8 @@ if (Get-Module -ListAvailable -Name Graphical) {
     import-module Graphical
 } 
 else {
-    write-warning "Module 'Graphical' wasn't found. Invoke 'install-module importexcel'."
+    #20
+    write-warning "Module 'Graphical' wasn't found. Invoke 'install-module Graphical'."
 }
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
