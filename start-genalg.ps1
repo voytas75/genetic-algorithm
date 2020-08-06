@@ -53,6 +53,9 @@ function Start-GA {
     #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
     if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
+    Remove-Variable -Name m -Scope script
+    Remove-Variable -Name _crossover -Scope script
+    Remove-Variable -Name _functionExecutionTime -Scope script
     #4
     new-variable -scope script -name m -Value 0
     #9
