@@ -322,7 +322,13 @@ if (Get-Module -ListAvailable -Name importexcel) {
     import-module importexcel
 } 
 else {
-    write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'."
+    write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
+}
+if (Get-Module -ListAvailable -Name Graphical) {
+    import-module Graphical
+} 
+else {
+    write-warning "Module 'Graphical' wasn't found. Invoke 'install-module importexcel'."
 }
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
@@ -462,6 +468,7 @@ Write-output "Fitness gain: [$FitnessGain %]"
 
 #<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
+Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
 #barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
 
