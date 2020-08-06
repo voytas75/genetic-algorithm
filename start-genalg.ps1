@@ -10,7 +10,7 @@ charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_ma
 function Start-GA {
     [CmdletBinding()]
     param (
-        [int]$generations = 20,
+        [int]$Generations = 20,
         [ValidateScript( {
                 if ($_ -eq 0) {
                     throw "Population size can not be [$_]!"
@@ -27,10 +27,10 @@ function Start-GA {
         [double]$CrossOverProbability = 0.6,
         [double]$MutationProbability = 0.001,
         [Validateset("Roulette", "Tournament")]
-        $selection = "Roulette",
-        [switch]$log,
-        [switch]$zeros,
-        [switch]$showGraph,
+        $Selection = "Roulette",
+        [switch]$Log,
+        [switch]$Zeros,
+        [switch]$ShowGraph,
         [switch]$ShowChart
     )
 
