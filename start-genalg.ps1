@@ -5,35 +5,219 @@ GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-math-net-numerics/
 charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
-#> 
-param (
-    [int]$generations = 20,
-    [ValidateScript( {
-            if ($_ -eq 0) {
-                throw "Population size can not be [$_]!"
+#>
+#8
+function Start-GA {
+    [CmdletBinding()]
+    param (
+        [int]$generations = 20,
+        [ValidateScript( {
+                if ($_ -eq 0) {
+                    throw "Population size can not be [$_]!"
+                }
+                elseif ($_ -gt 0 -and ($_ % 2) -ne 0 ) {
+                    throw "Population size [$_] is not even!"
+                }
+                else {
+                    $true
+                }
+            })]
+        [int]$PopulationSize = 30,
+        [int]$ChromosomeSize = 20,
+        [double]$CrossOverProbability = 0.6,
+        [double]$MutationProbability = 0.001,
+        [Validateset("Roulette", "Tournament")]
+        $selection = "Roulette",
+        [switch]$log,
+        [switch]$zeros,
+        [switch]$showGraph,
+        [switch]$ShowChart
+    )
+
+    $MeasureScript = [system.diagnostics.stopwatch]::startnew()
+
+    #7
+    if (Get-Module -ListAvailable -Name importexcel) {
+        import-module importexcel
+    } 
+    else {
+        write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
+    }
+    if (Get-Module -ListAvailable -Name Graphical) {
+        import-module Graphical
+    } 
+    else {
+        #20
+        write-warning "Module 'Graphical' wasn't found. Invoke 'install-module Graphical'."
+    }
+    #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
+
+    if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
+    #4
+    new-variable -scope script -name m -Value 0
+    #9
+    new-variable -scope script -name _crossover -Value 0
+    #5
+    New-Variable -Scope script -Name _functionExecutionTime -Value 0
+    #$_selectionDictionary = @("Roulette", "Tournament")
+    #$selection = $_selectionDictionary[0]
+    $_crossoverGlobalCount = 0      #9
+    $_mutations = 0     #4
+    $_SelectionGlobalExecutionTime = 0
+    $_CrossoverGlobalExecutionTime = 0
+    $_MutationGlobalExecutionTime = 0
+    if ($Log) { 
+        Write-Log "$(Get-Date): Number of iterations/generations: [$($generations)]" 
+        Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
+        Write-Log "$(Get-Date): Chromosome Size (genes): [$($ChromosomeSize)]" 
+        Write-Log "$(Get-Date): Crossover probability: [$($CrossOverProbability)]" 
+        Write-Log "$(Get-Date): Mutation probability: [$($MutationProbability)]" 
+    }
+    if ($zeros) {
+        [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+    }
+    else {
+        [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
+    }
+    if ($Log) { Write-Log "$(Get-Date): Population was generated." }
+    #11
+    if ($zeros -and $log) { Write-Log "$(Get-Date): Used param '-zeros'. Population with all genes = 0." }
+
+    if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
+    if ($zeros) {
+        $populationFitnessValue = GenerateFitnessValue_Population -population $population
+        $fitnessPopulation_max = 0
+        $fitnessPopulation_avg = 0
+        $fitnessPopulationZero = $fitnessPopulation = 0
+    }
+    else {
+        $populationFitnessValue = GenerateFitnessValue_Population -population $population
+        $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
+        $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
+        $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
+    }
+    if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
+    if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
+    if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
+    $IndexBestGeneration_2 = 0
+    $fitnessPopulationZero_2 = $fitnessPopulationZero
+    [array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
+    for ($i = 1; $i -le $generations; $i++) {
+        $fitnessPopulation = 0
+        if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
+        if ($Log) { Write-Log "$(Get-Date): Selection." }
+        switch ($selection) {
+            "roulette" {         
+                $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue -Population_Size $populationSize -_ChromosomeSize $ChromosomeSize
             }
-            elseif ($_ -gt 0 -and ($_ % 2) -ne 0 ) {
-                throw "Population size [$_] is not even!"
+            "tournament" {
+                $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue -Population_Size $populationSize
             }
-            else {
-                $true
-            }
-        })]
-    [int]$PopulationSize = 30,
-    [int]$ChromosomeSize = 20,
-    [double]$CrossOverProbability = 0.6,
-    [double]$MutationProbability = 0.001,
-    [Validateset("Roulette", "Tournament")]
-    $selection = "Roulette",
-    [switch]$log,
-    [switch]$zeros,
-    [switch]$showGraph,
-    [switch]$ShowChart
-)
+            Default {}
+        }
+        $_SelectionGlobalExecutionTime = $_SelectionGlobalExecutionTime + $script:_functionExecutionTime
+        $script:_functionExecutionTime = 0
+        if ($Log) { Write-Log "$(Get-Date): Crossover." }
+        $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability -Population_Size $populationSize
+        $_CrossoverGlobalExecutionTime = $_CrossoverGlobalExecutionTime + $script:_functionExecutionTime
+        $script:_functionExecutionTime = 0
+        #9
+        $_crossoverGlobalCount = $_crossoverGlobalCount + $script:_crossover
+        if ($Log) { Write-Log "$(Get-Date): Mutating." }
+        $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
+        $_MutationGlobalExecutionTime = $_MutationGlobalExecutionTime + $script:_functionExecutionTime
+        $script:_functionExecutionTime = 0
+        #4
+        $_mutations = $_mutations + $script:m
+        $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
+        $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
+        $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
+        $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
+        #PopulationStatictics -population $mutedPopulation -display
+        #" "
+        if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
+        if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
+        if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
+        if ($fitnessPopulationZero_2 -lt $fitnessPopulation) {
+            # first generation index with max
+            $IndexBestGeneration_2 = $i
+            $fitnessPopulationZero_2 = $fitnessPopulation
+        }
+        [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
+        $population = $mutedPopulation
+        if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
+        Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
+    }
+    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
+    if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
+    #9
+    if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
+    #4
+    if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
+    #5
+    if ($Log) { Write-Log "$(Get-Date): Global selection execution time: [$_SelectionGlobalExecutionTime ms]" }
+    if ($Log) { Write-Log "$(Get-Date): Global crossover execution time: [$_CrossoverGlobalExecutionTime ms]" }
+    if ($Log) { Write-Log "$(Get-Date): Global mutation execution time: [$_MutationGlobalExecutionTime ms]" }
+
+    $IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
+    if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration]" }
+    if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration_2]" }
+
+    if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
+    if ($zeros) {
+        $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) * 100)
+    }
+    else {
+        $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
+    }
+
+
+    $FitnessGain = "{0:n2}" -f $FitnessGain
+    if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
+    Write-output "Best generation: [$IndexBestGeneration_2]"
+    #Write-output "Best generation: [$IndexBestGeneration]"
+    Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
+    Write-output "Fitness gain: [$FitnessGain %]"
+    <#
+ Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
+ PS2EXE:
+ Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
+#>
+
+    #<#
+    $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
+    if ($showgraph) {
+        Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
+    }
+    #barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
+    #>
+
+    #$cd = New-ExcelChartDefinition -
+    #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
+    #$cd = New-ExcelChartDefinition -ChartType ColumnClustered -ChartTrendLine Linear
+    #$allGenerations.foreach{$psitem[1]} | Export-Excel -ExcelChartDefinition $cd -Show
+    #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
+    if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
+    if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
+    if ($Log) { "LOG: $env:TEMP\GA.log" }
+    #10
+    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
+    "OUT DATA: $env:TEMP\allGenerations.log"
+    #19
+    if ($ShowChart) {
+        # show and save
+        ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
+    }
+    else {
+        # save only
+        ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
+   
+    }
+}
 function generateChromosome {
     param (
         [ValidateNotNullorEmpty()]
-        [int]$geneCount,    #18
+        [int]$geneCount, #18
         [switch]$zeros
     )
     <#
@@ -53,9 +237,9 @@ function generatePopulation {
     [CmdletBinding()]
     param (
         [ValidateNotNullorEmpty()]
-        [int]$chromosomeCount,  #18
+        [int]$chromosomeCount, #18
         [ValidateNotNullorEmpty()]
-        [int]$geneCount,    #18
+        [int]$geneCount, #18
         [switch]$zeros
     )
     <# 
@@ -372,195 +556,4 @@ function Write-Log {
     [string]$Logfile = "$env:TEMP\GA.log"
     #Write-Debug -Message "Append ""$logstring"" to log file: ""$logfile"""
     Add-Content $logfile -Value $logstring -Force
-}
-
-
-
-
-#############################
-# MAIN CODE                 #
-#############################
-
-
-
-$MeasureScript = [system.diagnostics.stopwatch]::startnew()
-
-#7
-if (Get-Module -ListAvailable -Name importexcel) {
-    import-module importexcel
-} 
-else {
-    write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
-}
-if (Get-Module -ListAvailable -Name Graphical) {
-    import-module Graphical
-} 
-else {
-    #20
-    write-warning "Module 'Graphical' wasn't found. Invoke 'install-module Graphical'."
-}
-#7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
-
-# import function
-#. .\Write-Log.ps1
-
-if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
-#4
-new-variable -scope script -name m -Value 0
-#9
-new-variable -scope script -name _crossover -Value 0
-#5
-New-Variable -Scope script -Name _functionExecutionTime -Value 0
-#$_selectionDictionary = @("Roulette", "Tournament")
-#$selection = $_selectionDictionary[0]
-$_crossoverGlobalCount = 0      #9
-$_mutations = 0     #4
-$_SelectionGlobalExecutionTime = 0
-$_CrossoverGlobalExecutionTime = 0
-$_MutationGlobalExecutionTime = 0
-if ($Log) { 
-    Write-Log "$(Get-Date): Number of iterations/generations: [$($generations)]" 
-    Write-Log "$(Get-Date): Population size (chromosomes): [$($populationSize)]" 
-    Write-Log "$(Get-Date): Chromosome Size (genes): [$($ChromosomeSize)]" 
-    Write-Log "$(Get-Date): Crossover probability: [$($CrossOverProbability)]" 
-    Write-Log "$(Get-Date): Mutation probability: [$($MutationProbability)]" 
-}
-if ($zeros) {
-    [array]$population = generatePopulation -zeros -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-}
-else {
-    [array]$population = generatePopulation -chromosomeCount $PopulationSize -geneCount $ChromosomeSize
-}
-if ($Log) { Write-Log "$(Get-Date): Population was generated." }
-#11
-if ($zeros -and $log) { Write-Log "$(Get-Date): Used param '-zeros'. Population with all genes = 0." }
-
-if ($Log) { Write-Log "$(Get-Date): Generation/Iteration: [0]" }
-if ($zeros) {
-    $populationFitnessValue = GenerateFitnessValue_Population -population $population
-    $fitnessPopulation_max = 0
-    $fitnessPopulation_avg = 0
-    $fitnessPopulationZero = $fitnessPopulation = 0
-}
-else {
-    $populationFitnessValue = GenerateFitnessValue_Population -population $population
-    $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
-    $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
-    $fitnessPopulationZero = $fitnessPopulation = PopulationStatictics -population $population -fitness
-}
-if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
-if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
-if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
-$IndexBestGeneration_2 = 0
-$fitnessPopulationZero_2 = $fitnessPopulationZero
-[array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
-for ($i = 1; $i -le $generations; $i++) {
-    $fitnessPopulation = 0
-    if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
-    if ($Log) { Write-Log "$(Get-Date): Selection." }
-    switch ($selection) {
-        "roulette" {         
-            $_ReproductionItems = Roulette -population $population -fitness $populationFitnessValue -Population_Size $populationSize -_ChromosomeSize $ChromosomeSize
-        }
-        "tournament" {
-            $_ReproductionItems = Tournament -population $population -fitness $populationFitnessValue -Population_Size $populationSize
-        }
-        Default {}
-    }
-    $_SelectionGlobalExecutionTime = $_SelectionGlobalExecutionTime + $script:_functionExecutionTime
-    $script:_functionExecutionTime = 0
-    if ($Log) { Write-Log "$(Get-Date): Crossover." }
-    $CrossovertPopulation = Crossover -population $_ReproductionItems -ChromosomeSize $ChromosomeSize -crossoverProb $CrossOverProbability -Population_Size $populationSize
-    $_CrossoverGlobalExecutionTime = $_CrossoverGlobalExecutionTime + $script:_functionExecutionTime
-    $script:_functionExecutionTime = 0
-    #9
-    $_crossoverGlobalCount = $_crossoverGlobalCount + $script:_crossover
-    if ($Log) { Write-Log "$(Get-Date): Mutating." }
-    $mutedPopulation = Mutation -population $CrossovertPopulation -mutationProb $MutationProbability
-    $_MutationGlobalExecutionTime = $_MutationGlobalExecutionTime + $script:_functionExecutionTime
-    $script:_functionExecutionTime = 0
-    #4
-    $_mutations = $_mutations + $script:m
-    $populationFitnessValue = GenerateFitnessValue_Population -population $mutedPopulation
-    $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
-    $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
-    $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-    #PopulationStatictics -population $mutedPopulation -display
-    #" "
-    if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
-    if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
-    if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
-    if ($fitnessPopulationZero_2 -lt $fitnessPopulation) {
-        # first generation index with max
-        $IndexBestGeneration_2 = $i
-        $fitnessPopulationZero_2 = $fitnessPopulation
-    }
-    [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
-    $population = $mutedPopulation
-    if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
-    Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
-}
-$allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
-if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
-#9
-if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
-#4
-if ($Log) { Write-Log "$(Get-Date): Number of all mutations: [$_mutations]" }
-#5
-if ($Log) { Write-Log "$(Get-Date): Global selection execution time: [$_SelectionGlobalExecutionTime ms]" }
-if ($Log) { Write-Log "$(Get-Date): Global crossover execution time: [$_CrossoverGlobalExecutionTime ms]" }
-if ($Log) { Write-Log "$(Get-Date): Global mutation execution time: [$_MutationGlobalExecutionTime ms]" }
-
-$IndexBestGeneration = ($allGenerations  | sort-object @{Expression = { $_[1] }; Ascending = $false } | Select-Object @{expression = { $_[0] }; Label = "Generation" }, @{expression = { $_[1] }; Label = "Fitness" } -First 1).Generation
-if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration]" }
-if ($Log) { Write-Log "$(Get-Date): Index of generation with highest value of fitness function: [$IndexBestGeneration_2]" }
-
-if ($Log) { Write-Log "$(Get-Date): Highest value of fitness function: [$($allGenerations[$IndexBestGeneration][1])]" }
-if ($zeros) {
-    $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) * 100)
-}
-else {
-    $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
-}
-
-
-$FitnessGain = "{0:n2}" -f $FitnessGain
-if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
-Write-output "Best generation: [$IndexBestGeneration_2]"
-#Write-output "Best generation: [$IndexBestGeneration]"
-Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
-Write-output "Fitness gain: [$FitnessGain %]"
-<#
- Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
- PS2EXE:
- Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
-#>
-
-#<#
-$AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
-if ($showgraph) {
-    Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
-}
-#barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
-#>
-
-#$cd = New-ExcelChartDefinition -
-#$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-#$cd = New-ExcelChartDefinition -ChartType ColumnClustered -ChartTrendLine Linear
-#$allGenerations.foreach{$psitem[1]} | Export-Excel -ExcelChartDefinition $cd -Show
-#$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
-if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
-if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
-if ($Log) { "LOG: $env:TEMP\GA.log" }
-#10
-$allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
-"OUT DATA: $env:TEMP\allGenerations.log"
-#19
-if ($ShowChart) {
-    # show and save
-    ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
-} else {
-    # save only
-    ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
-   
 }
