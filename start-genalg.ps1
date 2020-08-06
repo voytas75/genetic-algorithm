@@ -367,6 +367,12 @@ function ShowChart {
     }
     "PNG: $env:TEMP\GA.png" 
 }
+function Write-Log {
+    param([string]$logstring)
+    [string]$Logfile = "$env:TEMP\GA.log"
+    #Write-Debug -Message "Append ""$logstring"" to log file: ""$logfile"""
+    Add-Content $logfile -Value $logstring -Force
+}
 
 
 
@@ -396,7 +402,7 @@ else {
 #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
 # import function
-. .\Write-Log.ps1
+#. .\Write-Log.ps1
 
 if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
 #4
