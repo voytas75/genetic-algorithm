@@ -553,4 +553,8 @@ $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
 if ($ShowChart) {
     # show and save
     ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
-} 
+} else {
+    # save only
+    ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
+   
+}
