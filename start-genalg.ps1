@@ -305,7 +305,68 @@ function Mutation {
     if ($Log) { Write-Log "$(Get-Date): Mutation execution time: ($script:_functionExecutionTime ms)" }
     return $population
 }
+#19
+function ShowChart {
+    param (
+        $AllGenerationFitness,
+        [switch]$SaveChart,
+        [switch]$ShowChart
+    )
+    # CHART
+    # load the appropriate assemblies
+    [void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+    [void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms.DataVisualization")
 
+    # create chart object
+    $Chart = New-object System.Windows.Forms.DataVisualization.Charting.Chart
+    $Chart.Width = 1000
+    $Chart.Height = 400
+    $Chart.Left = 40
+    $Chart.Top = 30
+
+    # create a chartarea to draw on and add to chart
+    $ChartArea = New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea
+    $Chart.ChartAreas.Add($ChartArea)
+
+    # add data to chart
+    #$Cities = @{London = 7556900; Berlin = 3429900; Madrid = 3213271; Rome = 2726539; Paris = 2188500 }
+    [void]$Chart.Series.Add("Data")
+    $gg = 0
+    $Chart.Series["Data"].Points.DataBindXY([int[]]$AllGenerationFitness.foreach{ , ($gg++) }, [int[]]$AllGenerationFitness )
+
+    # Find point with max/min values and change their colour
+    $maxValuePoint = $Chart.Series["Data"].Points.FindMaxByValue()
+    $maxValuePoint.Color = [System.Drawing.Color]::Red
+
+    $minValuePoint = $Chart.Series["Data"].Points.FindMinByValue()
+    $minValuePoint.Color = [System.Drawing.Color]::Green
+
+    # change chart area colour
+    #$Chart.BackColor = [System.Drawing.Color]::Transparent
+    # add a save button
+    $SaveButton = New-Object Windows.Forms.Button
+    $SaveButton.Text = "Save"
+    $SaveButton.Top = 500
+    $SaveButton.Left = 450
+    $SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right
+    $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
+    if ($SaveChart) {
+        $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
+    }
+    if ($ShowChart) {
+        # display the chart on a form
+        $Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
+        $Form = New-Object Windows.Forms.Form
+        $Form.Text = "PowerShell Chart"
+        $Form.Width = 1100
+        $Form.Height = 600
+        $Form.controls.add($Chart)
+        $Form.Add_Shown( { $Form.Activate() })
+        #$Form.controls.add($SaveButton)
+        $Form.ShowDialog()
+    }
+    "PNG: $env:TEMP\GA.png" 
+}
 
 
 
@@ -488,57 +549,9 @@ if ($Log) { "LOG: $env:TEMP\GA.log" }
 #10
 $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
 "OUT DATA: $env:TEMP\allGenerations.log"
-# CHART
-# load the appropriate assemblies
-[void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
-[void][Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms.DataVisualization")
-
-# create chart object
-$Chart = New-object System.Windows.Forms.DataVisualization.Charting.Chart
-$Chart.Width = 1000
-$Chart.Height = 400
-$Chart.Left = 40
-$Chart.Top = 30
-
-# create a chartarea to draw on and add to chart
-$ChartArea = New-Object System.Windows.Forms.DataVisualization.Charting.ChartArea
-$Chart.ChartAreas.Add($ChartArea)
-
-# add data to chart
-#$Cities = @{London = 7556900; Berlin = 3429900; Madrid = 3213271; Rome = 2726539; Paris = 2188500 }
-[void]$Chart.Series.Add("Data")
-$gg = 0
-$Chart.Series["Data"].Points.DataBindXY([int[]]$AllGenerationFitness.foreach{ , ($gg++) }, [int[]]$AllGenerationFitness )
-
-# Find point with max/min values and change their colour
-$maxValuePoint = $Chart.Series["Data"].Points.FindMaxByValue()
-$maxValuePoint.Color = [System.Drawing.Color]::Red
-
-$minValuePoint = $Chart.Series["Data"].Points.FindMinByValue()
-$minValuePoint.Color = [System.Drawing.Color]::Green
-
-# change chart area colour
-#$Chart.BackColor = [System.Drawing.Color]::Transparent
-
-# add a save button
-$SaveButton = New-Object Windows.Forms.Button
-$SaveButton.Text = "Save"
-$SaveButton.Top = 500
-$SaveButton.Left = 450
-$SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right
-$SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
-
-$Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
+#19
 if ($ShowChart) {
-    # display the chart on a form
-    $Chart.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right -bor [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left
-    $Form = New-Object Windows.Forms.Form
-    $Form.Text = "PowerShell Chart"
-    $Form.Width = 1100
-    $Form.Height = 600
-    $Form.controls.add($Chart)
-    $Form.Add_Shown( { $Form.Activate() })
-    #$Form.controls.add($SaveButton)
-    $Form.ShowDialog()
+ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
+} else {
+    ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
 }
-"PNG: $env:TEMP\GA.png" 
