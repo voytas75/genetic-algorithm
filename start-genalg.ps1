@@ -551,7 +551,5 @@ $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
 "OUT DATA: $env:TEMP\allGenerations.log"
 #19
 if ($ShowChart) {
-ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
-} else {
-    ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
-}
+    ShowChart -AllGenerationFitness $AllGenerationFitness -ShowChart -SaveChart
+} 
