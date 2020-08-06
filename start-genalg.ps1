@@ -460,6 +460,7 @@ $FitnessGain = "{0:n2}" -f $FitnessGain
 if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
 Write-output "Best generation: [$IndexBestGeneration_2]"
 #Write-output "Best generation: [$IndexBestGeneration]"
+Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
 Write-output "Fitness gain: [$FitnessGain %]"
 <#
  Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
