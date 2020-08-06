@@ -5,7 +5,20 @@ GA tutorial - https://www.tutorialspoint.com/genetic_algorithms/index.htm
 PowerShell Multithreading: A Deep Dive - https://adamtheautomator.com/powershell-multithreading/
 MathNet - https://www.sans.org/blog/truerng-random-numbers-with-powershell-and-math-net-numerics/
 charts in Powershell - https://docs.microsoft.com/en-us/archive/blogs/richard_macdonald/charting-with-powershell
+Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
+PS2EXE:
+Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
+, - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
+posortowanie tabeli hash po value i pobranie z pierwszego rekordu wartsci value:
+($b.GetEnumerator() | Sort-Object -Descending -Property value |Select-Object -First 1).value
+
+convert array to hash table:
+$d=@{}
+$i=0
+($population).foreach{$d[$i]=$_;$i++}
+Get-Random -Minimum 0.0 -maximum 1.0
 #>
+
 #8
 function Start-GA {
     [CmdletBinding()]
@@ -62,8 +75,6 @@ function Start-GA {
     new-variable -scope script -name _crossover -Value 0
     #5
     New-Variable -Scope script -Name _functionExecutionTime -Value 0
-    #$_selectionDictionary = @("Roulette", "Tournament")
-    #$selection = $_selectionDictionary[0]
     $_crossoverGlobalCount = 0      #9
     $_mutations = 0     #4
     $_SelectionGlobalExecutionTime = 0
@@ -136,8 +147,6 @@ function Start-GA {
         $fitnessPopulation_max = ($populationFitnessValue | Measure-Object -Maximum).Maximum
         $fitnessPopulation_avg = ($populationFitnessValue | Measure-Object -Average).Average
         $fitnessPopulation = PopulationStatictics -population $mutedPopulation -fitness 
-        #PopulationStatictics -population $mutedPopulation -display
-        #" "
         if ($Log) { Write-Log "$(Get-Date): Value of the fitness function of population: [$($fitnessPopulation)]" }
         if ($Log) { Write-Log "$(Get-Date): Maximum value of the fitness function for a chromosome in the population: [$($fitnessPopulation_max)]" }
         if ($Log) { Write-Log "$(Get-Date): Average value of the fitness function for the population: [$($fitnessPopulation_avg)]" }
@@ -173,33 +182,16 @@ function Start-GA {
     else {
         $FitnessGain = (($allGenerations[$IndexBestGeneration_2][1] - $fitnessPopulationZero) / $fitnessPopulationZero) * 100
     }
-
-
     $FitnessGain = "{0:n2}" -f $FitnessGain
     if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
     Write-output "Best generation: [$IndexBestGeneration_2]"
-    #Write-output "Best generation: [$IndexBestGeneration]"
     Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
     Write-output "Fitness gain: [$FitnessGain %]"
-    <#
- Trace-Command -Name ParameterBinding, TypeConversion -Expression {.\start-genalg.ps1} -PSHost
- PS2EXE:
- Invoke-ps2exe -inputFile .\start-genalg.ps1 -outputFile ga_x64.exe -x64 -noConsole -MTA
-#>
 
-    #<#
     $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
     if ($showgraph) {
         Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
     }
-    #barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
-    #>
-
-    #$cd = New-ExcelChartDefinition -
-    #$newarray | export-excel -Path "c:\temp\ga.xlsx" -barchart -show
-    #$cd = New-ExcelChartDefinition -ChartType ColumnClustered -ChartTrendLine Linear
-    #$allGenerations.foreach{$psitem[1]} | Export-Excel -ExcelChartDefinition $cd -Show
-    #$newarray | Export-Excel -Path "c:\temp\ga.xlsx" -ExcelChartDefinition $cd -AutoNameRange -Show 
     if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
     if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
     if ($Log) { "LOG: $env:TEMP\GA.log" }
@@ -248,8 +240,6 @@ function generatePopulation {
     <# 
     function generates chromosome one or more. 
     default values are definied. 
-
-    # , - https://devblogs.microsoft.com/powershell/array-literals-in-powershell/
     #>
     $_population = @()
     if ($zeros) {
@@ -381,43 +371,28 @@ function Tournament {
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $_Kindividuals = 4
     #17
-    #$_PopulationSize
-    #$_PopulationSize = PopulationStatictics -population $fitness -Count
     $_PopulationWinners = @()
     $_PopulationSize = $Population_Size
     for ($ii = 0; $ii -lt $_PopulationSize; $ii++) {
         $_population_hashtable_temp = @{}
         $_populationHashTable = @{}
         $i = 0
-        #convert array to hash table:
+        # convert array to hash table:
         $_populationHashTable = ($population).foreach{ $_population_hashtable_temp + @{item = $i; genome = $_; fitness = $fitness[$i] }; $i++ }
-        #get items to tournament
+        # get items to tournament
         $_TournamentPlayers = get-random -InputObject $_populationHashTable -count $_Kindividuals 
-        #sort items by fitness
+        # sort items by fitness
         $_TournamentPlayers_SortFitness = $_TournamentPlayers.GetEnumerator() | Sort-Object -property { $_.fitness } -descending
         $_TurnamentWinner = @{}
         # sorting items by fitness and take first one
         $_TurnamentWinner = $_TournamentPlayers_SortFitness | Select-Object -first 1
-        #building Tournament winner as population to mutate
+        # building Tournament winner as population to mutate
         $_PopulationWinners += , ($population[$_TurnamentWinner.item])
     }
     #5
     $script:_functionExecutionTime = $MeasureFunction.ElapsedMilliseconds
     if ($Log) { Write-Log "$(Get-Date): Selection 'Tournament' execution time: ($script:_functionExecutionTime ms)" }
-
     return $_PopulationWinners
-    <#
-    posortowanie tabeli hash po value i pobranie z pierwszego rekordu wartsci value:
-    ($b.GetEnumerator() | Sort-Object -Descending -Property value |Select-Object -First 1).value
-
-    convert array to hash table:
-    $d=@{}
-    $i=0
-    ($population).foreach{$d[$i]=$_;$i++}
-    #>
-
-    #$population | Export-Clixml -Path poulation.xml
-    #$fitness | Export-Clixml -Path fitness.xml
 }
 function Crossover {
     param (
@@ -432,9 +407,7 @@ function Crossover {
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     $script:_crossover = 0  #9
     [Object]$Random = New-Object System.Random
-    #Get-Random -Minimum 0.0 -maximum 1.0
     #17
-    #for ($i = 0; $i -lt (PopulationStatictics -population $population -count); $i += 2) {
     $_PopulationSize = $Population_Size
     for ($i = 0; $i -lt $_PopulationSize; $i += 2) {
         if (($Random.NextDouble()) -le $crossoverProb) { 
@@ -462,15 +435,13 @@ function Mutation {
     )
     $MeasureFunction = [system.diagnostics.stopwatch]::startnew()
     [Object]$Random = New-Object System.Random
-    #Get-Random -Minimum 0.0 -maximum 1.0
-
     $i = 0
     $script:m = 0
     foreach ($items in $population) {
         $j = 0
         foreach ($item in $items) {
             if (($Random.NextDouble()) -le $mutationProb) {
-                #we are in! mutation time! Lets change some genes!
+                # we are in! mutation time! Lets change some genes!
                 #4
                 $script:m++
                 if ($population[$i][$j] -eq 1) {
@@ -539,6 +510,7 @@ function ShowChart {
     $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
     if ($SaveChart) {
         $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
+        "PNG: $env:TEMP\GA.png" 
     }
     if ($ShowChart) {
         # display the chart on a form
@@ -552,11 +524,11 @@ function ShowChart {
         #$Form.controls.add($SaveButton)
         $Form.ShowDialog()
     }
-    "PNG: $env:TEMP\GA.png" 
 }
 function Write-Log {
-    param([string]$logstring)
+    param(
+        [string]$logstring
+    )
     [string]$Logfile = "$env:TEMP\GA.log"
-    #Write-Debug -Message "Append ""$logstring"" to log file: ""$logfile"""
     Add-Content $logfile -Value $logstring -Force
 }
