@@ -27,6 +27,7 @@ param (
     $selection = "Roulette",
     [switch]$log,
     [switch]$zeros,
+    [switch]$showGraph,
     [switch]$ShowChart
 )
 function generateChromosome {
@@ -468,7 +469,9 @@ Write-output "Fitness gain: [$FitnessGain %]"
 
 #<#
 $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
-Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
+if ($showgraph) {
+    Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
+}
 #barchart ($AllGenerationFitness) -ChartType line -nolegend -title "Generation's fitness value"
 #>
 
