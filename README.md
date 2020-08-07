@@ -10,6 +10,12 @@ This is a genetic algorithm written in Powershell.
 
 I decided to write it for two reasons. The first reason was to learn what a genetic algorithm is, the second reason was to gain experience in Powershell. The implementation of this algorithm is not difficult, but requires understanding what GA is and how it works.
 
+## Syntax
+
+```powershell
+Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [<CommonParameters>]
+```
+
 ## How to use it
 
 Using the script is very simple. First you need to run the script:
@@ -26,8 +32,4 @@ Then the genetic algorithm can be run:
 Start-GA
 ```
 
-Syntax of cmdlet:
 
-```powershell
-Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [<CommonParameters>]
-```
