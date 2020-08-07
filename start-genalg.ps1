@@ -69,7 +69,7 @@ function Start-GA {
                 import-module Graphical
             }
             catch {
-                continue
+                Write-Error "Error importing module 'Graphical'"
             } 
         } 
         else {
