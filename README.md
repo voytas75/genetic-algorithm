@@ -261,4 +261,7 @@ Start-GA -ShowChart
 
 Output:
 
+![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA2.png?raw=true)
+
+The green bar is an iteration where the value of the objective function for the population is minimal and the red color means the first iteration in which the value of the objective function was maximal.
 
