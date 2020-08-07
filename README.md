@@ -1,4 +1,4 @@
-# Genetic Algorithm
+# Genetic Algorithm in Powershell
 
 ![https://www.freepik.com/](https://image.freepik.com/free-vector/dna-sequence-hands-wireframe-dna-code-molecules-structure-mesh_127544-899.jpg)
 
@@ -151,7 +151,7 @@ The [Graphical](https://www.powershellgallery.com/packages/Graphical) module is 
 
 ```[-ShowChart]```
 
-After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm. 
+After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
 
 The [System.Windows.Forms](https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms) and [System.Windows.Forms.DataVisualizationmodule](https://docs.microsoft.com/en/dotnet/api/system.windows.forms.datavisualization.charting) namespaces are used.
 
@@ -190,3 +190,5 @@ Fitness gain: [261,11 %]
 OUT DATA: C:\Users\user\AppData\Local\Temp\allGenerations.log
 PNG: C:\Users\user\AppData\Local\Temp\GA.png
 ```
+
+Let's 
