@@ -26,3 +26,9 @@ Then the genetic algorithm can be run:
 ```powershell
 Start-GA
 ```
+
+Syntax of cmdlet:
+
+```powershell
+Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [<CommonParameters>]
+```
