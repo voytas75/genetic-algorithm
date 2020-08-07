@@ -265,3 +265,12 @@ Output:
 
 The green bar is an iteration where the value of the objective function for the population is minimal and the red color means the first iteration in which the value of the objective function was maximal.
 
+Let's run something else:
+
+```powershell
+Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -Log -ShowGraph
+```
+
+Output:
+
+![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA3.png?raw=true)
