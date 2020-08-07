@@ -1,9 +1,8 @@
-
-# ![https://www.freepik.com/](https://image.freepik.com/free-vector/dna-sequence-hands-wireframe-dna-code-molecules-structure-mesh_127544-899.jpg) 
-
 # Genetic Algorithm
 
-This is a genetic algorithm written in Powershell. 
+![https://www.freepik.com/](https://image.freepik.com/free-vector/dna-sequence-hands-wireframe-dna-code-molecules-structure-mesh_127544-899.jpg)
+
+This is a genetic algorithm written in Powershell.
 
 ## [What is GA?](https://en.wikipedia.org/wiki/Genetic_algorithm)
 
