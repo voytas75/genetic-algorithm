@@ -248,3 +248,6 @@ LOG: C:\Users\voytas\AppData\Local\Temp\GA.log
 OUT DATA: C:\Users\voytas\AppData\Local\Temp\allGenerations.log
 PNG: C:\Users\voytas\AppData\Local\Temp\GA.png
 ```
+
+![Output]([GA1.png](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA1.png?raw=true))
+
