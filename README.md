@@ -12,11 +12,51 @@ I decided to write it for two reasons. The first reason was to learn what a gene
 
 ## Syntax
 
+The command has the following syntax:
+
 ```powershell
 Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [<CommonParameters>]
 ```
 
 Let us now analyze the command syntax given above. I will describe all the parameters.
+
+### Generations
+
+```[[-Generations] <int>]```
+
+The parameter defines the number of recalculation iterations for the population before we complete the algorithm.
+
+The parameter has a default value and it is **20** generations.
+
+**Example**. We resize the population to 100 genomes:
+
+```powershell
+-Generations 100
+```
+
+### PopulationSize
+
+```[[-PopulationSize] <int>]```
+
+We define the size of the population used in the GA. Size is understood as the number of genomes - in this abbreviation a genome is equal to a chromosome. The size of the population is constant for the duration of the algorithm's operation and ___must be even___.
+
+The parameter has a default value and it is **30** genomes.
+
+**Example**. We resize the population to 100 genomes:
+
+```powershell
+-PopulationSize 50
+```
+
+### ChromosomeSize
+
+```[[-ChromosomeSize] <int>]```
+
+**Example**. We resize the genom/chromosome to 35 genes:
+
+```powershell
+-ChromosomeSize 35
+```
 
 ## How to use it
 
