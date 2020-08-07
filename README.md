@@ -121,6 +121,48 @@ It is not possible to specify the path and file name. The default value is ```$e
 -Log
 ```
 
+### Zeros
+
+```[-Zeros]```
+
+The switch specifies that the initial population consists of chromosomes, where all genes are 0. By default, the initial population is randomly generated.
+
+**Example**. To change the default behavior:
+
+```powershell
+-Zeros
+```
+
+### ShowGraph
+
+```[-ShowGraph]```
+
+After the algorithm is completed, an ASCII chart is generated. Draws graph in the Powershell console. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
+
+The [Graphical](https://www.powershellgallery.com/packages/Graphical) module is required.
+
+**Example**. To draw graph:
+
+```powershell
+-ShowGraph
+```
+
+### ShowChart
+
+```[-ShowChart]```
+
+After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm. 
+
+The [System.Windows.Forms](https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms) and [System.Windows.Forms.DataVisualizationmodule](https://docs.microsoft.com/en/dotnet/api/system.windows.forms.datavisualization.charting) namespaces are used.
+
+Regardless of whether the switch is turned on, a PNG image is generated and saved in ```$env:TEMP\GA.png```
+
+**Example**. To draw chart:
+
+```powershell
+-ShowChart
+```
+
 ## How to use it
 
 As the syntax is already known, we will learn how to run and use the script.
