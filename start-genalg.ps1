@@ -51,13 +51,23 @@ function Start-GA {
 
     #7
     if (Get-Module -ListAvailable -Name importexcel) {
-        import-module importexcel
+        try {
+            import-module importexcel  
+        }
+        catch {
+            continue
+        } 
     } 
     else {
         write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
     }
     if (Get-Module -ListAvailable -Name Graphical) {
-        import-module Graphical
+        try {
+            import-module Graphical
+        }
+        catch {
+            continue
+        } 
     } 
     else {
         #20
@@ -66,9 +76,10 @@ function Start-GA {
     #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
     if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
-    Remove-Variable -Name m -Scope script
-    Remove-Variable -Name _crossover -Scope script
-    Remove-Variable -Name _functionExecutionTime -Scope script
+    if (Get-Variable m -ErrorAction SilentlyContinue) { Remove-Variable m -Scope script }
+    if (Get-Variable _crossover -ErrorAction SilentlyContinue) { Remove-Variable _crossover -Scope script }
+    if (Get-Variable _functionExecutionTime -ErrorAction SilentlyContinue) { Remove-Variable _functionExecutionTime -Scope script }
+        
     #4
     new-variable -scope script -name m -Value 0
     #9
