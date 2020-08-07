@@ -28,10 +28,10 @@ The parameter defines the number of recalculation iterations for the population 
 
 The parameter has a default value and it is **20** generations.
 
-**Example**. We resize the population to 100 genomes:
+**Example**. We resize the population to 105 genomes:
 
 ```powershell
--Generations 100
+-Generations 105
 ```
 
 ### PopulationSize
@@ -52,10 +52,73 @@ The parameter has a default value and it is **30** genomes.
 
 ```[[-ChromosomeSize] <int>]```
 
+The parameter determines the number of genes in the chromosome.
+
+The parameter has a default value and it is **20** chromosomes.
+
 **Example**. We resize the genom/chromosome to 35 genes:
 
 ```powershell
 -ChromosomeSize 35
+```
+
+### CrossOverProbability
+
+```[[-CrossOverProbability] <double>]```
+
+Determines the probability of crossing two chromosomes at a crossing point. The crossing point is random and is not a parameter.
+
+The parameter has a default value and it is **0.6**.
+
+**Example**. We change the probability of crossover to 0.55:
+
+```powershell
+-CrossOverProbability 0.55
+```
+
+### MutationProbability
+
+```[[-MutationProbability] <double>]```
+
+The parameter determines the probability of a gene mutation in the chromosome. A mutation probability is generated for each gene.
+
+The parameter has a default value and it is **0.001**.
+
+**Example**. We change the probability of mutating gene to 0.0009:
+
+```powershell
+-MutationProbability 0.0009
+```
+
+### Selection
+
+```[[-Selection] <Object>]```
+
+The value of this parameter specifies the type of selection that will be used in the iteration of the genetic algorithm. The parameter has a defined list of values, they are:
+
+1. ```"Roulette"```
+2. ```"Tournament"```
+
+```"Roulette"``` is default one. The default value has been chosen because of its better performance.
+
+**Example**. We change the type of selection to ```"Tournament"```:
+
+```powershell
+-Selection Tournament
+```
+
+### Log
+
+```[-Log]```
+
+The switch determines whether a log file from the algorithm's operation is to be generated. If there is a log file, new data will be added to it.
+
+It is not possible to specify the path and file name. The default value is ```$env:TEMP\GA.log```
+
+**Example**. To enable the log file:
+
+```powershell
+-Log
 ```
 
 ## How to use it
