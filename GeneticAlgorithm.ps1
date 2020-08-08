@@ -194,20 +194,20 @@ function Start-GA {
     }
     $FitnessGain = "{0:n2}" -f $FitnessGain
     if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
-    Write-output "Best generation: [$IndexBestGeneration_2]"
-    Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
-    Write-output "Fitness gain: [$FitnessGain %]"
-
+    write-information -MessageData "Best generation: [$IndexBestGeneration_2]" -InformationAction Continue
+    write-information -MessageData "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]" -InformationAction Continue
+    write-information -MessageData "Fitness gain: [$FitnessGain %]" -InformationAction Continue
+    
     $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
     if ($showgraph) {
         Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
     }
     if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
     if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
-    if ($Log) { "LOG: $env:TEMP\GA.log" }
+    if ($Log) { Write-information -MessageData "LOG: $env:TEMP\GA.log" -InformationAction Continue }
     #10
     $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.json"
-    "OUT DATA: $env:TEMP\allGenerations.json"
+    write-information -MessageData "OUT DATA: $env:TEMP\allGenerations.json" -InformationAction Continue
     #19
     if ($ShowChart) {
         # show and save
