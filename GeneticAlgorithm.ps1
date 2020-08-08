@@ -50,30 +50,35 @@ function Start-GA {
 
     $MeasureScript = [system.diagnostics.stopwatch]::startnew()
 
-    #7
-    if (Get-Module -ListAvailable -Name importexcel) {
-        try {
-            import-module importexcel  
-        }
-        catch {
-            continue
+    #7 #25
+    if ($exportExcel) {
+        if (Get-Module -ListAvailable -Name importexcel) {
+            try {
+                import-module importexcel  
+            }
+            catch {
+                Write-Error "Error importing module 'importexcel'"
+            } 
         } 
-    } 
-    else {
-        write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
-    }
-    if (Get-Module -ListAvailable -Name Graphical) {
-        try {
-            import-module Graphical
+        else {
+            write-warning "Module 'ImportExcel' wasn't found. Invoke 'install-module importexcel'."
         }
-        catch {
-            continue
-        } 
-    } 
-    else {
-        #20
-        write-warning "Module 'Graphical' wasn't found. Invoke 'install-module Graphical'."
     }
+    if ($ShowGraph) {
+        if (Get-Module -ListAvailable -Name Graphical) {
+            try {
+                import-module Graphical
+            }
+            catch {
+                Write-Error "Error importing module 'Graphical'"
+            } 
+        } 
+        else {
+            #20
+            write-warning "Module 'Graphical' wasn't found. Invoke 'install-module Graphical'."
+        }    
+    }
+    
     #7 if (!(get-module importexcel)) { write-warning "Module 'ImportExcel wasn't found. Invoke 'install-module importexcel'." }
 
     if ($Log) { Write-Log "$(Get-Date): [Initialize GA]" }
