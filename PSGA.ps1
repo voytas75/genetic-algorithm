@@ -221,10 +221,44 @@ function Start-GA {
     }
     <#
 .SYNOPSIS
-Powershell module with implementation of genetic algorithm (GA). 
+Genetic Algorithm in Powershell. 
 .DESCRIPTION
 Powershell module with implementation of genetic algorithm (GA).
 .PARAMETER Generations
+The parameter defines the number of recalculation iterations for the population before we complete the algorithm.
+The parameter has a default value and it is 20 generations.
+.PARAMETER PopulationSize
+We define the size of the population used in the GA. Size is understood as the number of genomes - in this abbreviation a genome is equal to a chromosome. 
+The size of the population is constant for the duration of the algorithm's operation and must be even.
+The parameter has a default value and it is 30 genomes.
+.PARAMETER ChromosomeSize
+The parameter determines the number of genes in the chromosome.
+The parameter has a default value and it is 20 chromosomes.
+.PARAMETER CrossOverProbability
+Determines the probability of crossing two chromosomes at a crossing point. The crossing point is random and is not a parameter.
+The parameter has a default value and it is 0.6.
+.PARAMETER MutationProbability
+The parameter determines the probability of a gene mutation in the chromosome. A mutation probability is generated for each gene.
+The parameter has a default value and it is 0.001.
+.PARAMETER Selection
+The value of this parameter specifies the type of selection that will be used in the iteration of the genetic algorithm. 
+The parameter has a defined list of values, they are:
+1. "Roulette"
+2. "Tournament"
+"Roulette" is default one. The default value has been chosen because of its better performance.
+.PARAMETER Log
+The switch determines whether a log file from the algorithm's operation is to be generated. If there is a log file, new data will be added to it.
+It is not possible to specify the path and file name. The default value is $env:TEMP\GA.log
+.PARAMETER Zeros
+The switch specifies that the initial population consists of chromosomes, where all genes are 0. 
+By default, the initial population is randomly generated.
+.PARAMETER ShowGraph
+After the algorithm is completed, an ASCII chart is generated. Draws graph in the Powershell console. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
+The Graphical module is required.
+.PARAMETER ShowChart
+After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
+The [System.Windows.Forms] and [System.Windows.Forms.DataVisualizationmodule] namespaces are used.
+Regardless of whether the switch is turned on, a PNG image is generated and saved in $env:TEMP\GA.png
 .EXAMPLE
 PS> Start-GA
 
