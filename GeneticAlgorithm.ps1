@@ -44,7 +44,8 @@ function Start-GA {
         [switch]$Log,
         [switch]$Zeros,
         [switch]$ShowGraph,
-        [switch]$ShowChart
+        [switch]$ShowChart,
+        [switch]$ReturnAllGenerations
     )
 
     $MeasureScript = [system.diagnostics.stopwatch]::startnew()
@@ -127,6 +128,7 @@ function Start-GA {
     $IndexBestGeneration_2 = 0
     $fitnessPopulationZero_2 = $fitnessPopulationZero
     [array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
+    # Main genetic algorithm iteration region
     for ($i = 1; $i -le $generations; $i++) {
         $fitnessPopulation = 0
         if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
@@ -166,6 +168,7 @@ function Start-GA {
             $IndexBestGeneration_2 = $i
             $fitnessPopulationZero_2 = $fitnessPopulation
         }
+        # building generations data
         [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
         $population = $mutedPopulation
         if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
@@ -216,7 +219,9 @@ function Start-GA {
     else {
         # save only
         ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
-   
+    }
+    if ($ReturnAllGenerations) {
+        return $allGenerations
     }
     <#
 .SYNOPSIS
@@ -258,6 +263,8 @@ The Graphical module is required.
 After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
 The [System.Windows.Forms] and [System.Windows.Forms.DataVisualizationmodule] namespaces are used.
 Regardless of whether the switch is turned on, a PNG image is generated and saved in $env:TEMP\GA.png
+.PARAMETER ReturnAllGenerations
+Enabled parameter causes the function to return result array of all generations. The first element is the initial generation.
 .EXAMPLE
 Start-GA
 .EXAMPLE
@@ -266,6 +273,12 @@ Start-GA -Log -ShowGraph
 Start-GA -ShowChart
 .EXAMPLE
 Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -Log -ShowGraph
+.EXAMPLE
+[array[]]$GAOutput=Start-GA -Generations 80 -ChromosomeSize 60
+
+To display populations from 30 iterations:
+
+$GAOutput[30][2].foreach{"$_"}
 .LINK
 https://github.com/voytas75/genetic-algorithm
 .NOTES
@@ -573,8 +586,8 @@ function ShowChart {
     $SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right
     $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
     if ($SaveChart) {
-        $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
-        "PNG: $env:TEMP\GA.png" 
+        $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")         
+        write-information -MessageData "PNG: $env:TEMP\GA.png" -InformationAction Continue
     }
     if ($ShowChart) {
         # display the chart on a form
