@@ -1,8 +1,8 @@
-# Genetic Algorithm in Powershell
+# Genetic Algorithm Module in Powershell
 
 ![https://www.freepik.com/](https://image.freepik.com/free-vector/dna-sequence-hands-wireframe-dna-code-molecules-structure-mesh_127544-899.jpg)
 
-This is a genetic algorithm (GA) written in Powershell.
+This is a genetic algorithm (GA) module written in Powershell.
 
 ## [What is GA?](https://en.wikipedia.org/wiki/Genetic_algorithm)
 
@@ -15,7 +15,7 @@ I decided to write it for two reasons. The first reason was to learn what a gene
 The command has the following syntax:
 
 ```powershell
-Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [<CommonParameters>]
+Start-GA [[-Generations] <int>] [[-PopulationSize] <int>] [[-ChromosomeSize] <int>] [[-CrossOverProbability] <double>] [[-MutationProbability] <double>] [[-Selection] <Object>] [-Log] [-Zeros] [-ShowGraph] [-ShowChart] [-ReturnAllGenerations] [<CommonParameters>]
 ```
 
 Let us now analyze the command syntax given above. I will describe all the parameters.
@@ -163,17 +163,29 @@ Regardless of whether the switch is turned on, a PNG image is generated and save
 -ShowChart
 ```
 
+### ReturnAllGenerations
+
+```[-ReturnAllGenerations]```
+
+Enabled parameter causes the function to return result table of all generations. The first element is the initial generation.
+
 ## How to use it
 
-As the syntax is already known, we will learn how to run and use the script.
+As the syntax is already known, we will learn how to run and use the module.
 
-Using the script is very simple. First you need to run the script:
+### Install module
+
+Copy and Paste the following command to install this package using PowerShellGet:
 
 ```powershell
-. .\start-genalog.ps1
+Install-Module -Name GeneticAlgorithm
 ```
 
-The first period allows you to load functions from a file into the current scope.
+Command to install in current user's directory, `$home\Documents\PowerShell\Modules`:
+
+```powershell
+Install-Module -Name GeneticAlgorithm -Scope CurrentUser
+```
 
 Then the genetic algorithm can be run:
 
@@ -202,6 +214,10 @@ Description of output:
 ```OUT DATA: C:\Users\user\AppData\Local\Temp\allGenerations.log``` - The path of the generated JSON data file. The file contains all data from all iterations: the number of iterations, the values of the objective function of the entire population in that iteration, and the population itself. Iteration 0 refers to the initial population.
 
 ```PNG: C:\Users\user\AppData\Local\Temp\GA.png``` - The path of the generated PNG plot file of the objective function in iterations of the algorithm.
+
+### Examples
+
+#### Example 1
 
 Let's run a default algorithm with logging and ASCII graph:
 
@@ -253,6 +269,8 @@ PNG: C:\Users\voytas\AppData\Local\Temp\GA.png
 
 ```LOG: C:\Users\voytas\AppData\Local\Temp\GA.log``` - The path of the generated log file.
 
+#### Example 2
+
 Let's run a default algorithm with graphic chart:
 
 ```powershell
@@ -265,6 +283,8 @@ Output:
 
 The green bar is an iteration where the value of the objective function for the population is minimal and the red color means the first iteration in which the value of the objective function was maximal.
 
+#### Example 3
+
 Let's run something else:
 
 ```powershell
@@ -274,3 +294,13 @@ Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -
 Output:
 
 ![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA3.png?raw=true)
+
+#### Example 4
+
+Let us return an array with data of all populations processed by the algorithm. We display the population from 15's iteration and the value of the objective function::
+
+```powershell
+$GAout=Start-GA -Generations 80 -ChromosomeSize 60
+$GAOutput[15][2].foreach{"$_"}
+$GAOutput[30][1]
+```
