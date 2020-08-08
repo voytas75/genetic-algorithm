@@ -219,6 +219,78 @@ function Start-GA {
         ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
    
     }
+    <#
+.SYNOPSIS
+Finding scheduled tasks, system services on computer by user name. 
+.DESCRIPTION
+Finding scheduled tasks, system services on local or remote computer by given user name. 
+'Administrator' and local computer are default values.
+The results can be redirected to the log file (see 'log' parameter).
+.PARAMETER User
+User name to find scheduled tasks or system services. Default value is 'Administrator'.
+.PARAMETER Computer
+Computer to find tasks/services. Default value is 'localhost' ($env:COMPUTERNAME).
+.PARAMETER Task
+A Switch to look for scheduled tasks where user name is matched.
+.PARAMETER Service
+A Switch to look for system services where user name is matched.
+.PARAMETER Strict
+Find tasks, services by exact username.
+.PARAMETER Minimal
+A switch to enable minimalistic results. Object containing the computer name, number of tasks and/or number of services only. With -Log information about log file path is displayed but log file is not minimal. The return value is en object.
+.PARAMETER Export
+Enable exporting results objectsr to file (using "Export-Clixml"). Export file path is defined in "Exportpath" parameter.
+.PARAMETER Exportpath
+File name path to export results finding scheduled tasks and/or system services.
+.PARAMETER ExportJSON
+Enable exporting results as JSON object.
+.PARAMETER ExportJSONpath
+File name path for JSON export.
+.PARAMETER Log
+A switch to enable logging of output data to a log file. The log file with the path is defined in "LogFile" parameter.
+.PARAMETER Logfile
+Path with file name where logging output. Default value is [$env:TEMP]\find-taskserviceuser.log. Works only with Log switch.
+.PARAMETER OpenProjectSite
+The switch opens the project web page on GitHub and ends the script operation.
+.EXAMPLE
+PS> Find-TaskServiceUser -Computer "WSRV00" -User "BobbyK" -Service -Task -Log
+
+Description
+-----------
+Find system services and scheduled tasks on "WSRV00" for user name is matched "BobbyK". Logging is enabled.
+.EXAMPLE
+PS> "WSRV01","WSRV02" | Find-TaskServiceUser -Service -Task
+
+Description
+-----------
+Find system services and scheduled tasks on computers "WSRV01", "WSRV02"  where user name is matched "Administrator".
+.EXAMPLE
+PS> $data = Find-TaskServiceUser -Task -Service -Server "WSRV04" -User "SYSTEM" -Minimal
+PS> $data
+
+Description
+-----------
+Find tasks and services on computer "WSRV04" for "SYSTEM" user and return a minimalistic result as custom object `$data`.
+.EXAMPLE
+PS> "WSRV01","WSRV10" | Find-TaskServiceUser -Service -Task -Export
+PS> $data = Import-Clixml "C:\Users\test_user\Documents\Find-TaskServiceUser.XML"
+PS> $data.Tasks | Format-Table -Autosize
+PS> $data.Services | Format-Table -Autosize
+
+Description
+-----------
+Find system services and scheduled tasks on computers "WSRV01", "WSRV10" where user name is matched "Administrator". Results are exported to XML file and then imported to $data variable. Results are displayed.
+.LINK
+https://github.com/voytas75/Find-TaskServiceUser
+.LINK
+https://www.powershellgallery.com/packages/Find-TaskServiceUser
+.NOTES
+ICON CREDITS: Module icon made by [Freepik](https://www.freepik.com/) from [Flaticon](https://www.flaticon.com/) is licensed [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0/)
+DONATION: If you want to support my work https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ZQJXFYKHL7JUA&currency_code=PLN&source=url
+My post on reddit to request for comments: https://www.reddit.com/r/PowerShell/comments/fzzf1u/i_would_like_to_show_off_my_first_module_to_find/
+Weekend Scripter: Welcome to the PowerShell Information Stream: https://devblogs.microsoft.com/scripting/weekend-scripter-welcome-to-the-powershell-information-stream/
+#>
+
 }
 function generateChromosome {
     param (
