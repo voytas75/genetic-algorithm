@@ -171,7 +171,6 @@ function Start-GA {
         if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
         Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
     }
-    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
     if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
     #9
     if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
@@ -207,8 +206,8 @@ function Start-GA {
     if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
     if ($Log) { "LOG: $env:TEMP\GA.log" }
     #10
-    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
-    "OUT DATA: $env:TEMP\allGenerations.log"
+    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.json"
+    "OUT DATA: $env:TEMP\allGenerations.json"
     #19
     if ($ShowChart) {
         # show and save
