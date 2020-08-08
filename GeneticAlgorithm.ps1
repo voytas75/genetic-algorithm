@@ -44,7 +44,8 @@ function Start-GA {
         [switch]$Log,
         [switch]$Zeros,
         [switch]$ShowGraph,
-        [switch]$ShowChart
+        [switch]$ShowChart,
+        [switch]$ReturnAllGenerations
     )
 
     $MeasureScript = [system.diagnostics.stopwatch]::startnew()
@@ -132,6 +133,7 @@ function Start-GA {
     $IndexBestGeneration_2 = 0
     $fitnessPopulationZero_2 = $fitnessPopulationZero
     [array[]]$allGenerations += , @(0, $fitnessPopulation, $population)
+    # Main genetic algorithm iteration region
     for ($i = 1; $i -le $generations; $i++) {
         $fitnessPopulation = 0
         if ($Log) { Write-Log "$(Get-Date): No. Generation/Iteration: [$($i)]" }
@@ -171,12 +173,12 @@ function Start-GA {
             $IndexBestGeneration_2 = $i
             $fitnessPopulationZero_2 = $fitnessPopulation
         }
+        # building generations data
         [array[]]$allGenerations += , @($i, $fitnessPopulation, $mutedPopulation)
         $population = $mutedPopulation
         if ($Log) { Write-Log "$(Get-Date): End generation/iteration (index): [$($i)]" }
         Write-Progress -Activity "Reproduction" -Status "Progress:" -PercentComplete ($i / $generations * 100)
     }
-    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
     if ($Log) { Write-Log "$(Get-Date): End of all generations/Iterations." }
     #9
     if ($Log) { Write-Log "$(Get-Date): Number of all crossovers: [$_crossoverGlobalCount]" }
@@ -200,20 +202,20 @@ function Start-GA {
     }
     $FitnessGain = "{0:n2}" -f $FitnessGain
     if ($Log) { Write-Log "$(Get-Date): Fitness gain (((f(max)-f(0))/f(0))*100): [$FitnessGain %]" }
-    Write-output "Best generation: [$IndexBestGeneration_2]"
-    Write-output "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]"
-    Write-output "Fitness gain: [$FitnessGain %]"
-
+    write-information -MessageData "Best generation: [$IndexBestGeneration_2]" -InformationAction Continue
+    write-information -MessageData "Best fitness: [$($allGenerations[$IndexBestGeneration_2][1])]" -InformationAction Continue
+    write-information -MessageData "Fitness gain: [$FitnessGain %]" -InformationAction Continue
+    
     $AllGenerationFitness = $allGenerations.foreach{ $psitem[1] }
     if ($showgraph) {
         Show-Graph $AllGenerationFitness -XAxisTitle "Generations" -YAxisTitle "Fitness" -GraphTitle "GA"
     }
     if ($Log) { Write-Log "$(Get-Date): Script execution time: [$($MeasureScript.ElapsedMilliseconds) ms]" }
     if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
-    if ($Log) { "LOG: $env:TEMP\GA.log" }
+    if ($Log) { Write-information -MessageData "LOG: $env:TEMP\GA.log" -InformationAction Continue }
     #10
-    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.log"
-    "OUT DATA: $env:TEMP\allGenerations.log"
+    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.json"
+    write-information -MessageData "OUT DATA: $env:TEMP\allGenerations.json" -InformationAction Continue
     #19
     if ($ShowChart) {
         # show and save
@@ -222,8 +224,72 @@ function Start-GA {
     else {
         # save only
         ShowChart -AllGenerationFitness $AllGenerationFitness -SaveChart
-   
     }
+    if ($ReturnAllGenerations) {
+        return $allGenerations
+    }
+    <#
+.SYNOPSIS
+Genetic Algorithm in Powershell. 
+.DESCRIPTION
+Powershell module with implementation of genetic algorithm (GA).
+.PARAMETER Generations
+The parameter defines the number of recalculation iterations for the population before we complete the algorithm.
+The parameter has a default value and it is 20 generations.
+.PARAMETER PopulationSize
+We define the size of the population used in the GA. Size is understood as the number of genomes - in this abbreviation a genome is equal to a chromosome. 
+The size of the population is constant for the duration of the algorithm's operation and must be even.
+The parameter has a default value and it is 30 genomes.
+.PARAMETER ChromosomeSize
+The parameter determines the number of genes in the chromosome.
+The parameter has a default value and it is 20 chromosomes.
+.PARAMETER CrossOverProbability
+Determines the probability of crossing two chromosomes at a crossing point. The crossing point is random and is not a parameter.
+The parameter has a default value and it is 0.6.
+.PARAMETER MutationProbability
+The parameter determines the probability of a gene mutation in the chromosome. A mutation probability is generated for each gene.
+The parameter has a default value and it is 0.001.
+.PARAMETER Selection
+The value of this parameter specifies the type of selection that will be used in the iteration of the genetic algorithm. 
+The parameter has a defined list of values, they are:
+1. "Roulette"
+2. "Tournament"
+"Roulette" is default one. The default value has been chosen because of its better performance.
+.PARAMETER Log
+The switch determines whether a log file from the algorithm's operation is to be generated. If there is a log file, new data will be added to it.
+It is not possible to specify the path and file name. The default value is $env:TEMP\GA.log
+.PARAMETER Zeros
+The switch specifies that the initial population consists of chromosomes, where all genes are 0. 
+By default, the initial population is randomly generated.
+.PARAMETER ShowGraph
+After the algorithm is completed, an ASCII chart is generated. Draws graph in the Powershell console. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
+The Graphical module is required.
+.PARAMETER ShowChart
+After the algorithm is completed, an PNG chart is generated. The graph is the value of the objective function for the initial population and population from all iterations of the algorithm.
+The [System.Windows.Forms] and [System.Windows.Forms.DataVisualizationmodule] namespaces are used.
+Regardless of whether the switch is turned on, a PNG image is generated and saved in $env:TEMP\GA.png
+.PARAMETER ReturnAllGenerations
+Enabled parameter causes the function to return result array of all generations. The first element is the initial generation.
+.EXAMPLE
+Start-GA
+.EXAMPLE
+Start-GA -Log -ShowGraph
+.EXAMPLE
+Start-GA -ShowChart
+.EXAMPLE
+Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -Log -ShowGraph
+.EXAMPLE
+[array[]]$GAOutput=Start-GA -Generations 80 -ChromosomeSize 60
+
+To display populations from 30 iterations:
+
+$GAOutput[30][2].foreach{"$_"}
+.LINK
+https://github.com/voytas75/genetic-algorithm
+.NOTES
+My post on reddit to request for comments: https://www.reddit.com/r/PowerShell/comments/i5csrc/genetic_algorithm_in_powershell/
+#>
+
 }
 function generateChromosome {
     param (
@@ -525,8 +591,8 @@ function ShowChart {
     $SaveButton.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Right
     $SaveButton.add_click( { $Chart.SaveImage($env:TEMP + "\GA.png", "PNG") })
     if ($SaveChart) {
-        $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")
-        "PNG: $env:TEMP\GA.png" 
+        $Chart.SaveImage($env:TEMP + "\GA.png", "PNG")         
+        write-information -MessageData "PNG: $env:TEMP\GA.png" -InformationAction Continue
     }
     if ($ShowChart) {
         # display the chart on a form
