@@ -260,29 +260,13 @@ After the algorithm is completed, an PNG chart is generated. The graph is the va
 The [System.Windows.Forms] and [System.Windows.Forms.DataVisualizationmodule] namespaces are used.
 Regardless of whether the switch is turned on, a PNG image is generated and saved in $env:TEMP\GA.png
 .EXAMPLE
-PS> Start-GA
-
-Description
------------
-
+Start-GA
 .EXAMPLE
-PS> Start-GA -Log -ShowGraph
-
-Description
------------
-
+Start-GA -Log -ShowGraph
 .EXAMPLE
-PS> Start-GA -ShowChart
-
-Description
------------
-
+Start-GA -ShowChart
 .EXAMPLE
-PS> Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -Log -ShowGraph
-
-Description
------------
-
+Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -Log -ShowGraph
 .LINK
 https://github.com/voytas75/genetic-algorithm
 .NOTES
