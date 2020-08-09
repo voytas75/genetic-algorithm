@@ -301,6 +301,6 @@ Let us return an array with data of all populations processed by the algorithm. 
 
 ```powershell
 $GAout=Start-GA -Generations 80 -ChromosomeSize 60
-$GAOutput[15][2].foreach{"$_"}
-$GAOutput[30][1]
+$GAout[15][2].foreach{"$_"}
+$GAout[30][1]
 ```
