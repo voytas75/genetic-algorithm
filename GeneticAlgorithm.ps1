@@ -612,5 +612,6 @@ function Write-Log {
         [string]$logstring
     )
     [string]$Logfile = "$env:TEMP\GA.log"
-    Add-Content $logfile -Value $logstring -Force
+    # add new line to log file
+    $logstring | Out-File $Logfile -Append -Encoding utf8
 }
