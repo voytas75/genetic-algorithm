@@ -17,6 +17,10 @@ $d=@{}
 $i=0
 ($population).foreach{$d[$i]=$_;$i++}
 Get-Random -Minimum 0.0 -maximum 1.0
+
+How to calculate the Crossover, Mutation rate and population size for Genetic algorithm?:
+https://www.researchgate.net/post/How_to_calculate_the_Crossover_Mutation_rate_and_population_size_for_Genetic_algorithm
+
 #>
 
 #8
