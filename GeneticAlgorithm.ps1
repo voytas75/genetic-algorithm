@@ -214,7 +214,7 @@ function Start-GA {
     if ($Log) { Write-Log "$(Get-Date): [End of GA]" }
     if ($Log) { Write-information -MessageData "LOG: $env:TEMP\GA.log" -InformationAction Continue }
     #10
-    $allGenerations | ConvertTo-Json -Depth 3| Out-File "$env:TEMP\allGenerations.json"
+    $allGenerations | ConvertTo-Json | Out-File "$env:TEMP\allGenerations.json"
     write-information -MessageData "OUT DATA: $env:TEMP\allGenerations.json" -InformationAction Continue
     #19
     if ($ShowChart) {
