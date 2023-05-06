@@ -4,6 +4,8 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e06abc1e24c3498387b8003ea0051296)](https://app.codacy.com/gh/voytas75/genetic-algorithm/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A6KYBUS)
+
 This is a genetic algorithm (GA) module written in Powershell.
 
 ## [What is GA?](https://en.wikipedia.org/wiki/Genetic_algorithm)
