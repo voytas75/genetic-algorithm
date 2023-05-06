@@ -2,9 +2,9 @@
 
 ![https://www.freepik.com/](https://image.freepik.com/free-vector/dna-sequence-hands-wireframe-dna-code-molecules-structure-mesh_127544-899.jpg)
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e06abc1e24c3498387b8003ea0051296)](https://app.codacy.com/gh/voytas75/genetic-algorithm/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A0A6KYBUS)
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e06abc1e24c3498387b8003ea0051296)](https://app.codacy.com/gh/voytas75/genetic-algorithm/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 This is a genetic algorithm (GA) module written in Powershell.
 
