@@ -297,7 +297,7 @@ Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -
 
 Output:
 
-![Output](ttps://github.com/voytas75/genetic-algorithm/blob/master/images/GA3.png?raw=true)
+![Output](https://github.com/voytas75/genetic-algorithm/blob/master/images/GA3.png?raw=true)
 
 #### Example 4
 
