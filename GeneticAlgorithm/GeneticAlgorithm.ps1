@@ -296,23 +296,25 @@ My post on reddit to request for comments: https://www.reddit.com/r/PowerShell/c
 
 }
 function generateChromosome {
+    [CmdletBinding()]
     param (
-        [ValidateNotNullorEmpty()]
-        [int]$geneCount, #18
-        [switch]$zeros
+        [int]$GeneCount = 20,
+        [switch]$Zeros
     )
-    <#
-    function generate vale of gene
-    powershell statistics
-    check .net statistics 
-    #>
-    $_chromosome = @()
-    if ($zeros) {
-        return [array]$_chromosome = (1..$genecount).foreach{ 0 } 
+
+    $chromosome = @()
+
+    if ($Zeros) {
+        $chromosome = 0 * $GeneCount
     }
     else {
-        return [array]$_chromosome = (1..$genecount).foreach{ 0..1 | get-random } 
+        for ($i = 0; $i -lt $GeneCount; $i++) {
+            $gene = Get-Random -Minimum 0 -Maximum 2
+            $chromosome += $gene
+        }
     }
+
+    return $chromosome
 }
 function generatePopulation {
     [CmdletBinding()]
@@ -336,40 +338,44 @@ function generatePopulation {
     }
     return $_population
 }
-function PopulationStatictics {
+function PopulationStatistics {
+    [CmdletBinding()]
     param (
-        [ValidateNotNullorEmpty()]
-        [array[]]$population,
-        [switch]$Count,
-        [switch]$fitness,
-        [switch]$Maximum,
-        [switch]$Average,
-        [switch]$display        
+        [Parameter(Mandatory=$true, Position=0)]
+        [array]$Population
     )
-    <# 
-    param options - https://learn-powershell.net/2014/02/04/using-powershell-parameter-validation-to-make-your-day-easier/
-    #>
-    $_FitnessSum = 0
-    if ($fitness) {
-        #$_fitness = GenerateFitnessValue_Population -population $population
-        (GenerateFitnessValue_Population -population $population).foreach{ $_FitnessSum += $PSItem }
-        return $_FitnessSum
+
+    $populationSize = $Population.Count
+    $chromosomeLength = $Population[0].Length
+
+    $totalFitness = 0
+    $maxFitness = 0
+    $minFitness = [double]::MaxValue
+
+    foreach ($chromosome in $Population) {
+        $fitness = calculateFitness -Chromosome $chromosome
+        $totalFitness += $fitness
+
+        if ($fitness -gt $maxFitness) {
+            $maxFitness = $fitness
+        }
+
+        if ($fitness -lt $minFitness) {
+            $minFitness = $fitness
+        }
     }
-    elseif ($Count) {
-        return $population.count
+
+    $averageFitness = $totalFitness / $populationSize
+
+    $statistics = @{
+        PopulationSize = $populationSize
+        ChromosomeLength = $chromosomeLength
+        AverageFitness = $averageFitness
+        MaxFitness = $maxFitness
+        MinFitness = $minFitness
     }
-    elseif ($Maximum) {
-        return $population.count
-    }
-    elseif ($Average) {
-        return $population.count
-    }
-    elseif ($display) {
-        $population.foreach{ "[$_]" }
-    }
-    else {
-        return $null
-    }
+
+    return $statistics
 }
 function GenerateFitnessValue_Population {
     param (
