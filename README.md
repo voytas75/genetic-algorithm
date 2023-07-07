@@ -154,7 +154,7 @@ $GAout[10][2].foreach{"$_"}
 $GAout[10][1]
 ```
 
-These commands will execute the genetic algorithm with specific parameter values and store the output in the `$GAout` variable. You can then access the data of specific populations using array indexing (switch `ReturnAllGenerations`). In this example, it retrieves the data of the 15th iteration and displays the chromosomes, as well as the value of the objective function for the 30th iteration.
+These commands will execute the genetic algorithm with specific parameter values and store the output in the `$GAout` variable. You can then access the data of specific populations using array indexing (switch `ReturnAllGenerations`). In this example, it retrieves the data of the 10th iteration and displays the chromosomes, as well as the value of the objective function for the iteration.
 
 Output:
 
