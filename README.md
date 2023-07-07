@@ -269,7 +269,7 @@ OUT DATA: C:\Users\voytas\AppData\Local\Temp\allGenerations.log
 PNG: C:\Users\voytas\AppData\Local\Temp\GA.png
 ```
 
-![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA1.png?raw=true)
+![Output](https://github.com/voytas75/genetic-algorithm/blob/master/images/GA1.png?raw=true)
 
 ```LOG: C:\Users\voytas\AppData\Local\Temp\GA.log``` - The path of the generated log file.
 
@@ -283,7 +283,7 @@ Start-GA -ShowChart
 
 Output:
 
-![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA2.png?raw=true)
+![Output](https://github.com/voytas75/genetic-algorithm/blob/master/images/GA2.png?raw=true)
 
 The green bar is an iteration where the value of the objective function for the population is minimal and the red color means the first iteration in which the value of the objective function was maximal.
 
@@ -297,7 +297,7 @@ Start-GA -Generations 100 -PopulationSize 40 -MutationProbability 0.009 -zeros -
 
 Output:
 
-![Output](https://raw.githubusercontent.com/voytas75/genetic-algorithm/master/GA3.png?raw=true)
+![Output](ttps://github.com/voytas75/genetic-algorithm/blob/master/images/GA3.png?raw=true)
 
 #### Example 4
 
