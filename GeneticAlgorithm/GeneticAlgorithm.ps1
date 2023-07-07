@@ -293,8 +293,8 @@ https://github.com/voytas75/genetic-algorithm
 .NOTES
 My post on reddit to request for comments: https://www.reddit.com/r/PowerShell/comments/i5csrc/genetic_algorithm_in_powershell/
 #>
-
 }
+
 function generateChromosome {
     [CmdletBinding()]
     param (
